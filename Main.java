@@ -9,6 +9,11 @@ public class Main{
 
         System.out.println(cube);
 
+        cube.Scramble();
+
+        System.out.println(cube);
+
+        /*
         // showcase all 18 permutations
         for (Cube.Color c : Cube.Color.values()){
 
@@ -27,6 +32,8 @@ public class Main{
             System.out.println(c + "2");
             System.out.println(cube);
             cube.ToDefault();
-        }
+        }*/
+
+        
     }
 }
