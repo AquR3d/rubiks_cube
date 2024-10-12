@@ -4,15 +4,11 @@ public class Main{
     public static void main(String[] args){
         System.out.println("amongus");
 
-        Cube cube = new Cube();
+        Cube cube = new Cube(20);
 
         System.out.println(cube);
+
         /*
-        cube.Scramble();
-
-        System.out.println(cube);*/
-
-        
         // showcase all 18 permutations
         for (Cube.Color c : Cube.Color.values()){
 
@@ -31,7 +27,7 @@ public class Main{
             System.out.println(c + "2");
             System.out.println(cube);
             cube.toDefault();
-        }
+        }*/
 
         
     }

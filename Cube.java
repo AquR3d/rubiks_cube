@@ -55,6 +55,18 @@ public class Cube {
                 default: return null;
             }
         }
+
+        public static Color fromString(String idx){
+            switch (idx){
+                case "R": return RED;
+                case "B": return BLUE;
+                case "W": return WHITE;
+                case "Y": return YELLOW;
+                case "O": return ORANGE;
+                case "G": return GREEN;
+                default: return null;
+            }
+        }
     }
 
     // the KEY will represent the side color aka the center color BC CENTER COLOR SHALL STAY CONSISTENT
@@ -63,9 +75,36 @@ public class Cube {
 
     // make default cube
     public Cube(){
-        matrix = makeDefault();
+        toDefault();
     }
 
+    public Cube(boolean scramble){
+        this();
+        if (scramble) this.scramble();
+    }
+
+    public Cube(int turns){
+        this();
+        if (turns <= 0) return;
+
+        scramble(turns);
+    }
+
+    public Cube(Cube other){
+        this.matrix.putAll(other.matrix);
+    }
+
+    public Cube(String sequence){
+        this();
+        scramble(sequence);
+    }
+
+    public Cube(String[] sequence){
+        this();
+        scramble(sequence);
+    }
+
+    // makes this cube the solved permutation
     public void toDefault(){
         matrix = makeDefault();
     }
@@ -168,20 +207,73 @@ public class Cube {
         ArraySwap.swapFour(face, 1, 5, 7, 3, clockwise);
     }
 
-    public void scramble(String sequence){
-        scramble(sequence.split(" ", 0));
+    // overload
+    public boolean scramble(String sequence){
+        return scramble(sequence.split(" ", 0));
+    }
+    // scrambles this cube based on the string array sequence of moves.  returns true or false if it was successful.
+    public boolean scramble(String[] sequence){
+        int length = sequence.length;
+
+        /* 
+            this for loop will purely check for preconditions
+            it will check if this is a valid sequence
+            so we now it's safe to start scrambling
+        */
+        for (int i = 0; i < length; i++){
+
+            String curr = sequence[i];
+            if (curr.length() < 1 || curr.length() > 2) return false;
+            else if (curr.length() == 2){
+                String type = curr.substring(1, 2);
+                if (!type.equals("\'") || !type.equals("2")){
+                    return false;
+                }
+            }
+            Color face = Color.fromString(curr.substring(0, 1));
+            if (face == null) return false;
+        }
+
+        // this loop will do the scrambling
+        for (int i = 0; i < length; i++){
+
+            String curr = sequence[i];
+            Color face = Color.fromString(curr.substring(0, 1));
+
+            switch (curr.substring(1)){
+                case "":
+                    turn(face, true);
+                    break;
+                case "\'":
+                    turn(face, false);
+                    break;
+                case "2":
+                    turn(face, true);
+                    turn(face, true);
+                    break;
+            }
+        }
+
+        return true;
     }
 
-    public void scramble(String[] sequence){
+    // scrambles this cube for a certain amount of turns
+    public boolean scramble(int turns){
+        return scramble(turns, turns);
+    }
 
+    // default scramble for 5 to 20 moves
+    public boolean scramble(){
+        return scramble(5, 20);
     }
     
-    public void scramble(){
+    // scrambles 
+    public boolean scramble(int min, int max){
 
         // scramble sequence
         String scrambleSeq = "";
 
-        int numturns = (int)(16 * Math.random()) + 5; // 10-20 moves
+        int numturns = (int)((max - min + 1) * Math.random()) + min;
 
         while (numturns > 0){
             numturns--;
@@ -212,6 +304,12 @@ public class Cube {
         }
 
         System.out.println(scrambleSeq);
+        return true;
+    }
+
+    // THE THING WE'VE ALL BEEN WAITING FOR.  This function gives a sequence of turns that would solve this cube.
+    public String[] solve(){
+        return null;
     }
 
     @Override public String toString(){
