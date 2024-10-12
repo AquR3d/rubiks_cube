@@ -63,15 +63,15 @@ public class Cube {
 
     // make default cube
     public Cube(){
-        matrix = MakeDefault();
+        matrix = makeDefault();
     }
 
-    public void ToDefault(){
-        matrix = MakeDefault();
+    public void toDefault(){
+        matrix = makeDefault();
     }
 
     // converts this object into a solved cube
-    private Map<Color, Color[]> MakeDefault(){
+    private Map<Color, Color[]> makeDefault(){
 
         Map<Color, Color[]> cube = new HashMap<Color, Color[]>();
 
@@ -80,7 +80,7 @@ public class Cube {
         // make faces
         Color[] face; // buffer
         for (int i = 0; i < NUM_FACES; i++){
-            face = FullColorFace(colorOrder[i]);
+            face = fullColorFace(colorOrder[i]);
             cube.put(colorOrder[i], face);
         }
 
@@ -88,7 +88,7 @@ public class Cube {
     }
 
     // make 3x3 color array of same color
-    private Color[] FullColorFace(Color faceColor){
+    private Color[] fullColorFace(Color faceColor){
 
         Color[] face = new Color[PIECES_PER_FACE];
 
@@ -101,82 +101,90 @@ public class Cube {
 
     // changes the cube map based on what face was turned
     // clockwise is considered looking at a face on the CUBE_MAP and rotating it clockwise
-    public void Turn(Color faceToTurn, boolean clockwise){
+    public void turn(Color faceToturn, boolean clockwise){
         // i'm not smart enough to make code reusable for all 12 different turns
 
-        FaceTurn(faceToTurn, clockwise);
-        switch (faceToTurn){
+        faceturn(faceToturn, clockwise);
+        switch (faceToturn){
 
             // CORNER SWAPPING = "alpha" and "beta" refer to the different sides of the corner, for r2 = "1:w6 & 2:b0", for r8 = "1:b6 & 2: y0"  
             case BLUE:
                 // CORNERS
-                ArraySwap.SwapFour(matrix.get(Color.RED), 2, matrix.get(Color.WHITE), 8, matrix.get(Color.ORANGE), 6, matrix.get(Color.YELLOW), 0, clockwise); // alpha
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 6, matrix.get(Color.ORANGE), 0, matrix.get(Color.YELLOW), 2, matrix.get(Color.RED), 8, clockwise); // beta
+                ArraySwap.swapFour(matrix.get(Color.RED), 2, matrix.get(Color.WHITE), 8, matrix.get(Color.ORANGE), 6, matrix.get(Color.YELLOW), 0, clockwise); // alpha
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 6, matrix.get(Color.ORANGE), 0, matrix.get(Color.YELLOW), 2, matrix.get(Color.RED), 8, clockwise); // beta
 
                 // EDGES
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 7, matrix.get(Color.ORANGE), 3, matrix.get(Color.YELLOW), 1, matrix.get(Color.RED), 5, clockwise);
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 7, matrix.get(Color.ORANGE), 3, matrix.get(Color.YELLOW), 1, matrix.get(Color.RED), 5, clockwise);
                 break;
             case GREEN:
                 // CORNERS
-                ArraySwap.SwapFour(matrix.get(Color.ORANGE), 2, matrix.get(Color.WHITE), 0, matrix.get(Color.RED), 6, matrix.get(Color.YELLOW), 8, clockwise); // alpha
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 2, matrix.get(Color.RED), 0, matrix.get(Color.YELLOW), 6, matrix.get(Color.ORANGE), 8, clockwise); // beta
+                ArraySwap.swapFour(matrix.get(Color.ORANGE), 2, matrix.get(Color.WHITE), 0, matrix.get(Color.RED), 6, matrix.get(Color.YELLOW), 8, clockwise); // alpha
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 2, matrix.get(Color.RED), 0, matrix.get(Color.YELLOW), 6, matrix.get(Color.ORANGE), 8, clockwise); // beta
 
                 // EDGES
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 1, matrix.get(Color.RED), 3, matrix.get(Color.YELLOW), 7, matrix.get(Color.ORANGE), 5, clockwise);
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 1, matrix.get(Color.RED), 3, matrix.get(Color.YELLOW), 7, matrix.get(Color.ORANGE), 5, clockwise);
                 break;
             case ORANGE:
                 // CORNERS
-                ArraySwap.SwapFour(matrix.get(Color.BLUE), 2, matrix.get(Color.WHITE), 2, matrix.get(Color.GREEN), 6, matrix.get(Color.YELLOW), 2, clockwise); // alpha
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 8, matrix.get(Color.GREEN), 0, matrix.get(Color.YELLOW), 8, matrix.get(Color.BLUE), 8, clockwise); // beta
+                ArraySwap.swapFour(matrix.get(Color.BLUE), 2, matrix.get(Color.WHITE), 2, matrix.get(Color.GREEN), 6, matrix.get(Color.YELLOW), 2, clockwise); // alpha
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 8, matrix.get(Color.GREEN), 0, matrix.get(Color.YELLOW), 8, matrix.get(Color.BLUE), 8, clockwise); // beta
 
                 // EDGES
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 5, matrix.get(Color.GREEN), 3, matrix.get(Color.YELLOW), 5, matrix.get(Color.BLUE), 5, clockwise);
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 5, matrix.get(Color.GREEN), 3, matrix.get(Color.YELLOW), 5, matrix.get(Color.BLUE), 5, clockwise);
                 break;
             case RED:
                 // CORNERS
-                ArraySwap.SwapFour(matrix.get(Color.GREEN), 2, matrix.get(Color.WHITE), 6, matrix.get(Color.BLUE), 6, matrix.get(Color.YELLOW), 6, clockwise); // alpha
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 0, matrix.get(Color.BLUE), 0, matrix.get(Color.YELLOW), 0, matrix.get(Color.GREEN), 8, clockwise); // beta
+                ArraySwap.swapFour(matrix.get(Color.GREEN), 2, matrix.get(Color.WHITE), 6, matrix.get(Color.BLUE), 6, matrix.get(Color.YELLOW), 6, clockwise); // alpha
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 0, matrix.get(Color.BLUE), 0, matrix.get(Color.YELLOW), 0, matrix.get(Color.GREEN), 8, clockwise); // beta
 
                 // EDGES
-                ArraySwap.SwapFour(matrix.get(Color.WHITE), 3, matrix.get(Color.BLUE), 3, matrix.get(Color.YELLOW), 3, matrix.get(Color.GREEN), 5, clockwise);
+                ArraySwap.swapFour(matrix.get(Color.WHITE), 3, matrix.get(Color.BLUE), 3, matrix.get(Color.YELLOW), 3, matrix.get(Color.GREEN), 5, clockwise);
                 break;
             case WHITE:
                 // CORNERS
-                ArraySwap.SwapFour(matrix.get(Color.RED), 0, matrix.get(Color.GREEN), 0, matrix.get(Color.ORANGE), 0, matrix.get(Color.BLUE), 0, clockwise); // alpha
-                ArraySwap.SwapFour(matrix.get(Color.GREEN), 2, matrix.get(Color.ORANGE), 2, matrix.get(Color.BLUE), 2, matrix.get(Color.RED), 2, clockwise); // beta
+                ArraySwap.swapFour(matrix.get(Color.RED), 0, matrix.get(Color.GREEN), 0, matrix.get(Color.ORANGE), 0, matrix.get(Color.BLUE), 0, clockwise); // alpha
+                ArraySwap.swapFour(matrix.get(Color.GREEN), 2, matrix.get(Color.ORANGE), 2, matrix.get(Color.BLUE), 2, matrix.get(Color.RED), 2, clockwise); // beta
 
                 // EDGES
-                ArraySwap.SwapFour(matrix.get(Color.GREEN), 1, matrix.get(Color.ORANGE), 1, matrix.get(Color.BLUE), 1, matrix.get(Color.RED), 1, clockwise);
+                ArraySwap.swapFour(matrix.get(Color.GREEN), 1, matrix.get(Color.ORANGE), 1, matrix.get(Color.BLUE), 1, matrix.get(Color.RED), 1, clockwise);
                 break;
             case YELLOW:
                 // CORNERS
-                ArraySwap.SwapFour(matrix.get(Color.RED), 8, matrix.get(Color.BLUE), 8, matrix.get(Color.ORANGE), 8, matrix.get(Color.GREEN), 8, clockwise); // alpha
-                ArraySwap.SwapFour(matrix.get(Color.BLUE), 6, matrix.get(Color.ORANGE), 6, matrix.get(Color.GREEN), 6, matrix.get(Color.RED), 6, clockwise); // beta
+                ArraySwap.swapFour(matrix.get(Color.RED), 8, matrix.get(Color.BLUE), 8, matrix.get(Color.ORANGE), 8, matrix.get(Color.GREEN), 8, clockwise); // alpha
+                ArraySwap.swapFour(matrix.get(Color.BLUE), 6, matrix.get(Color.ORANGE), 6, matrix.get(Color.GREEN), 6, matrix.get(Color.RED), 6, clockwise); // beta
 
                 // EDGES
-                ArraySwap.SwapFour(matrix.get(Color.BLUE), 7, matrix.get(Color.ORANGE), 7, matrix.get(Color.GREEN), 7, matrix.get(Color.RED), 7, clockwise);
+                ArraySwap.swapFour(matrix.get(Color.BLUE), 7, matrix.get(Color.ORANGE), 7, matrix.get(Color.GREEN), 7, matrix.get(Color.RED), 7, clockwise);
                 break;
 
         }
     }
 
     // turns just the face...
-    private void FaceTurn(Color faceToTurn, boolean clockwise){
-        Color[] face = matrix.get(faceToTurn);
+    private void faceturn(Color faceToturn, boolean clockwise){
+        Color[] face = matrix.get(faceToturn);
 
-        ArraySwap.SwapFour(face, 0, 2, 8, 6, clockwise);
-        ArraySwap.SwapFour(face, 1, 5, 7, 3, clockwise);
+        ArraySwap.swapFour(face, 0, 2, 8, 6, clockwise);
+        ArraySwap.swapFour(face, 1, 5, 7, 3, clockwise);
+    }
+
+    public void scramble(String sequence){
+        scramble(sequence.split(" ", 0));
+    }
+
+    public void scramble(String[] sequence){
+
     }
     
-    public void Scramble(){
+    public void scramble(){
 
         // scramble sequence
         String scrambleSeq = "";
 
-        int numTurns = (int)(16 * Math.random()) + 5; // 10-20 moves
+        int numturns = (int)(16 * Math.random()) + 5; // 10-20 moves
 
-        while (numTurns > 0){
-            numTurns--;
+        while (numturns > 0){
+            numturns--;
 
             int turnFace = (int)(6 * Math.random());
             int turnType = (int)(3 * Math.random());
@@ -187,16 +195,16 @@ public class Cube {
 
             switch (turnType){
                 case 0:
-                    Turn(face, true);
+                    turn(face, true);
                     break;
                 case 1:
                     scrambleSeq += "\'";
-                    Turn(face, false);
+                    turn(face, false);
                     break;
                 case 2:
                     scrambleSeq += "2";
-                    Turn(face, true);
-                    Turn(face, true);
+                    turn(face, true);
+                    turn(face, true);
                     break;
             }
 
@@ -208,10 +216,10 @@ public class Cube {
 
     @Override public String toString(){
 
-        return GetCubeMap();
+        return getCubeMap();
     }
 
-    private String GetCubeMap(){
+    private String getCubeMap(){
         // MAKES THE VISUAL CUBE MAP
         String msg = "";
 
