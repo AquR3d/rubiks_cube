@@ -2,9 +2,8 @@
 public class Main{
 
     public static void main(String[] args){
-        System.out.println("amongus");
 
-        Cube cube = new Cube(20);
+        Cube cube = new Cube("B O' B2 Y' W B' W' R Y' W2 O Y W2 W W2 G Y' R B' B2");
 
         System.out.println(cube);
 

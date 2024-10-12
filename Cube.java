@@ -96,7 +96,7 @@ public class Cube {
 
     public Cube(String sequence){
         this();
-        scramble(sequence);
+        this.scramble(sequence);
     }
 
     public Cube(String[] sequence){
@@ -209,7 +209,7 @@ public class Cube {
 
     // overload
     public boolean scramble(String sequence){
-        return scramble(sequence.split(" ", 0));
+        return scramble(sequence.split(" ", -1));
     }
     // scrambles this cube based on the string array sequence of moves.  returns true or false if it was successful.
     public boolean scramble(String[] sequence){
@@ -226,7 +226,7 @@ public class Cube {
             if (curr.length() < 1 || curr.length() > 2) return false;
             else if (curr.length() == 2){
                 String type = curr.substring(1, 2);
-                if (!type.equals("\'") || !type.equals("2")){
+                if (!type.equals("\'") && !type.equals("2")){
                     return false;
                 }
             }
@@ -313,11 +313,10 @@ public class Cube {
     }
 
     @Override public String toString(){
-
         return getCubeMap();
     }
 
-    private String getCubeMap(){
+    public String getCubeMap(){
         // MAKES THE VISUAL CUBE MAP
         String msg = "";
 
