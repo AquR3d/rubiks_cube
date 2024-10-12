@@ -267,49 +267,73 @@ public class Cube {
         return scramble(turns, turns);
     }
 
+    public boolean scramble(int turns, boolean optimized){
+        return scramble(turns, turns, optimized);
+    }
+
     // default scramble for 5 to 20 moves
     public boolean scramble(){
         return scramble(5, 20);
     }
-    
-    // scrambles 
+
+    public boolean scramble(boolean optimized){
+        return scramble(5, 20, optimized);
+    }
+
     public boolean scramble(int min, int max){
+        return scramble(min, max, true);
+    }
+    
+    /**
+     * scrambles between min-max moves. 
+     * @param boolean optimized
+     * if true, the turns generated will not repeat tunring the same face as the previous move.
+     * if false, duplicate face turns are not checked.
+     */ 
+    public boolean scramble(int min, int max, boolean optimized){
+
+        // setup randoms
+        int numTurns = (int)((max - min + 1) * Math.random()) + min;
+        int turnFace = 0, turnType = 0;
+        Color face = null;
 
         // scramble sequence
-        String scrambleSeq = "";
+        String[] scrambleSeq = new String[numTurns];
 
-        int numturns = (int)((max - min + 1) * Math.random()) + min;
+        for (int t = 0; t < numTurns; t++){
 
-        while (numturns > 0){
-            numturns--;
+            // setup random
+            turnFace = (int)(6 * Math.random());
+            turnType = (int)(3 * Math.random());
+            face = Color.fromInt(turnFace);
 
-            int turnFace = (int)(6 * Math.random());
-            int turnType = (int)(3 * Math.random());
-            Color face = Color.fromInt(turnFace);
-
-            scrambleSeq += face.toString();
-
-
-            switch (turnType){
-                case 0:
-                    turn(face, true);
-                    break;
-                case 1:
-                    scrambleSeq += "\'";
-                    turn(face, false);
-                    break;
-                case 2:
-                    scrambleSeq += "2";
-                    turn(face, true);
-                    turn(face, true);
-                    break;
+            // if we're optimizing the turns...
+            if (optimized){
+                // if we have at least one turn && the previous move and this move have the same turn face...
+                if (t > 0 && scrambleSeq[t-1].substring(0,1).equals(face.toString())){
+                    // try doing this move again.
+                    t--;
+                    continue;
+                }
             }
 
-            scrambleSeq += " ";
+            String currTurn = "";
+            scrambleSeq[t] = currTurn;
+
+            scrambleSeq[t] += face.toString();
+
+            switch (turnType){
+                case 1:
+                    scrambleSeq[t] += "\'";
+                    break;
+                case 2:
+                    scrambleSeq[t] += "2";
+                    break;
+            }
         }
 
-        System.out.println(scrambleSeq);
-        return true;
+        System.out.println(Arrays.toString(scrambleSeq));
+        return scramble(scrambleSeq);
     }
 
     // THE THING WE'VE ALL BEEN WAITING FOR.  This function gives a sequence of turns that would solve this cube.

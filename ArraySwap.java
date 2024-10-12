@@ -46,15 +46,4 @@ public abstract class ArraySwap{
             swap(arr2, idx2, arr3, idx3);
         }
     }
-
-    public static String toString(Object[] array){
-        String msg = "{";
-        for (Object obj : array){
-            msg = msg + obj.toString() + ",";
-        }
-
-        msg = msg.substring(0, msg.length()-1) + "}";
-
-        return msg;
-    }
 }
