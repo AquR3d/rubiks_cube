@@ -1,3 +1,12 @@
+/**
+ * This class swaps elements across or within the same array.
+ * 
+ * It also has a customized swap function that swaps across 4 specific elements
+ * in a certain order (clockwise or counterclockwise) defined in the function.
+ * 
+ * The Cube data structure class uses this class in order to accomplish
+ * the representation of configurations of a cube, like turning.
+ */
 public abstract class ArraySwap{
     // swaps these elements in the array
     public static void swap(Object[] array, int idx1, int idx2){
@@ -26,7 +35,6 @@ public abstract class ArraySwap{
              
             arr4 <- arr3
         */
-        
         // swapping clockwise in this function is defined as moving arr1 to arr2, arr2 to arr3... arr4 to arr1.
         if (clockwise){
             swap(arr1, idx1, arr2, idx2);
@@ -40,7 +48,6 @@ public abstract class ArraySwap{
     }
 
     public static String toString(Object[] array){
-
         String msg = "{";
         for (Object obj : array){
             msg = msg + obj.toString() + ",";

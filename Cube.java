@@ -1,6 +1,11 @@
 import java.util.*;
 
-// this class will be responsible for handling the data of a cube.
+/***
+ * This class is a custom data structure for handling the data of a 3x3 Rubik's cube, 
+ * and representing configurations like "turning the cube" in this data structure.
+ * 
+ * This class will aid in the algorithm solving process of a Rubik's cube.
+ */
 public class Cube {
 
     /*
@@ -71,7 +76,7 @@ public class Cube {
 
     // the KEY will represent the side color aka the center color BC CENTER COLOR SHALL STAY CONSISTENT
     // the VALUE will be the pieces on this face according to the "CUBE_MAP"
-    public Map<Color, Color[]> matrix;
+    private Map<Color, Color[]> matrix;
 
     // make default cube
     public Cube(){
@@ -314,6 +319,18 @@ public class Cube {
 
     @Override public String toString(){
         return getCubeMap();
+    }
+
+    public boolean equals(Cube other){
+        // check if the keyset is the same for both matrices AND the keyset is the enums of colors (it should, but just in case)
+        if (!this.matrix.keySet().equals(other.matrix.keySet()) && Set.of(Color.values()).equals(this.matrix.keySet())) return false;
+
+        // check if the values of both matrices are the same...
+        for (Color c : Color.values()){
+            if (!Arrays.equals(matrix.get(c), other.matrix.get(c))) return false;
+        }
+
+        return true;
     }
 
     public String getCubeMap(){
