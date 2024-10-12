@@ -145,7 +145,7 @@ public class Cube {
 
     // changes the cube map based on what face was turned
     // clockwise is considered looking at a face on the CUBE_MAP and rotating it clockwise
-    public void turn(Color faceToturn, boolean clockwise){
+    public boolean turn(Color faceToturn, boolean clockwise){
         // i'm not smart enough to make code reusable for all 12 different turns
 
         faceturn(faceToturn, clockwise);
@@ -202,6 +202,30 @@ public class Cube {
                 break;
 
         }
+
+        return true;
+    }
+
+    public boolean turn(String turn){
+
+        // if this is NOT a valid turn string... return false
+        if (turn.length() < 1 || turn.length() > 2) return false;
+        if (Color.fromString(turn.substring(0, 1)) == null) return false;
+
+        String turnType = turn.substring(1);
+
+        if (!(turnType.equals("") || turnType.equals("\'") || turnType.equals("2"))) return false;
+
+        // else... do the turn
+        Color face = Color.fromString(turn.substring(0, 1));
+        
+        switch(turnType){
+            case "": turn(face, true); break;
+            case "\'": turn(face, false); break;
+            case "2": turn(face, true); turn(face, true); break;
+        }
+
+        return true;
     }
 
     // turns just the face...
