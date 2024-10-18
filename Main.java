@@ -4,14 +4,12 @@ public class Main{
     public static void main(String[] args){
 
         Cube cube = new Cube();
-        Cube cube2 = cube;
-        Cube cube3 = new Cube(cube);
-
-        cube.turn("W'");
+        
+        //cube.scramble();s
+        cube.scramble(5);
+        cube.turn("R2");
 
         System.out.println(cube);
-        System.out.println(cube2);
-        System.out.println(cube3);
 
         /*
         // showcase all 18 permutations

@@ -41,7 +41,7 @@ public class Cube {
     public final int NUM_FACES = 6;
     public final int PIECES_PER_FACE = 9; // # of pieces on ONE face
 
-    public enum Color{
+    /*public enum Color{
         RED { @Override public String toString(){ return "R"; } },
         BLUE { @Override public String toString(){ return "B"; } },
         WHITE { @Override public String toString(){ return "W"; } },
@@ -72,7 +72,7 @@ public class Cube {
                 default: return null;
             }
         }
-    }
+    }*/
 
     // the KEY will represent the side color aka the center color BC CENTER COLOR SHALL STAY CONSISTENT
     // the VALUE will be the pieces on this face according to the "CUBE_MAP"
@@ -418,6 +418,10 @@ public class Cube {
         }
 
         return msg;
+    }
+
+    public Map<Color, Color[]> getMatrix(){
+        return matrix; // saves data
     }
 
 }

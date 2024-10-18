@@ -9,5 +9,34 @@ import java.util.*;
  * the specified Cube instantiated within it.
  */
 public class CubeAlgorithm {
+    private Cube solved;
+    private Cube scramble;
+    
 
+    public CubeAlgorithm(Cube other){
+        scramble = other;
+        solved = new Cube();
+    }
+
+    public String[] solve(){
+
+        // gimme scramble
+
+        return null;
+    }
+
+    public boolean isG_PRIME(Cube instance){
+
+        Map<Color, Color[]> matrix = instance.getMatrix();
+
+        // check 4 edge triples
+        Color[] yellow = matrix.get(Color.YELLOW);
+        Color[] white = matrix.get(Color.WHITE);
+
+
+        // check 4 corner triples
+
+
+        return true;
+    }
 }
