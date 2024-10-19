@@ -41,39 +41,6 @@ public class Cube {
     public final int NUM_FACES = 6;
     public final int PIECES_PER_FACE = 9; // # of pieces on ONE face
 
-    /*public enum Color{
-        RED { @Override public String toString(){ return "R"; } },
-        BLUE { @Override public String toString(){ return "B"; } },
-        WHITE { @Override public String toString(){ return "W"; } },
-        YELLOW { @Override public String toString(){ return "Y"; } },
-        ORANGE { @Override public String toString(){ return "O"; } },
-        GREEN { @Override public String toString(){ return "G"; } };
-
-        public static Color fromInt(int idx){
-            switch (idx){
-                case 0: return RED;
-                case 1: return BLUE;
-                case 2: return WHITE;
-                case 3: return YELLOW;
-                case 4: return ORANGE;
-                case 5: return GREEN;
-                default: return null;
-            }
-        }
-
-        public static Color fromString(String idx){
-            switch (idx){
-                case "R": return RED;
-                case "B": return BLUE;
-                case "W": return WHITE;
-                case "Y": return YELLOW;
-                case "O": return ORANGE;
-                case "G": return GREEN;
-                default: return null;
-            }
-        }
-    }*/
-
     // the KEY will represent the side color aka the center color BC CENTER COLOR SHALL STAY CONSISTENT
     // the VALUE will be the pieces on this face according to the "CUBE_MAP"
     private Map<Color, Color[]> matrix;
@@ -422,6 +389,108 @@ public class Cube {
 
     public Map<Color, Color[]> getMatrix(){
         return matrix; // saves data
+    }
+
+    // return the color on the red-orange side of this piece
+    public Color getAlpha(Piece p){
+        switch(p){
+            case R0G2W0: return matrix.get(Color.RED)[0];
+            case G1W1: return null;
+            case O2G0W2: return matrix.get(Color.ORANGE)[2];
+            case R1W3: return matrix.get(Color.RED)[1];
+            case W4: return null;
+            case O1W5: return matrix.get(Color.ORANGE)[1];
+            case R2B0W6: return matrix.get(Color.RED)[2];
+            case B1W7: return null;
+            case O0B2W8: return matrix.get(Color.ORANGE)[0];
+            case R3G5: return matrix.get(Color.RED)[3];
+            case G4: return null; 
+            case O5G3: return matrix.get(Color.ORANGE)[5];
+            case R4: return matrix.get(Color.RED)[4];
+            case NULL: return null;
+            case O4: return matrix.get(Color.ORANGE)[4];
+            case R5B3: return matrix.get(Color.RED)[5];
+            case B4: return null; 
+            case O3B5: return matrix.get(Color.ORANGE)[3];
+            case R6G8Y6: return matrix.get(Color.RED)[6];
+            case G7Y7: return null;
+            case O8G6Y8: return matrix.get(Color.ORANGE)[8];
+            case R7Y3: return matrix.get(Color.RED)[7];
+            case Y4: return null; 
+            case O7Y5: return matrix.get(Color.ORANGE)[7];
+            case R8B6Y0: return matrix.get(Color.RED)[8];
+            case B7Y1: return null;
+            case O6B8Y2: return matrix.get(Color.ORANGE)[6];
+            default: return null;
+        }
+    }
+
+    // return the color on the blue-green side of this piece
+    public Color getBeta(Piece p){
+        switch(p){
+            case R0G2W0: return matrix.get(Color.GREEN)[2];
+            case G1W1: return matrix.get(Color.GREEN)[1];
+            case O2G0W2: return matrix.get(Color.GREEN)[0];
+            case R1W3: return null;
+            case W4: return null;
+            case O1W5: return null;
+            case R2B0W6: return matrix.get(Color.BLUE)[0];
+            case B1W7: return matrix.get(Color.BLUE)[1];
+            case O0B2W8: return matrix.get(Color.BLUE)[2];
+            case R3G5: return matrix.get(Color.GREEN)[5];
+            case G4: return matrix.get(Color.GREEN)[4]; 
+            case O5G3: return matrix.get(Color.GREEN)[3];
+            case R4: return null;
+            case NULL: return null; 
+            case O4: return null;
+            case R5B3: return matrix.get(Color.BLUE)[3];
+            case B4: return matrix.get(Color.BLUE)[4]; 
+            case O3B5: return matrix.get(Color.BLUE)[5];
+            case R6G8Y6: return matrix.get(Color.GREEN)[8];
+            case G7Y7: return matrix.get(Color.GREEN)[7];
+            case O8G6Y8: return matrix.get(Color.GREEN)[6];
+            case R7Y3: return null;
+            case Y4: return null; 
+            case O7Y5: return null;
+            case R8B6Y0: return matrix.get(Color.BLUE)[6];
+            case B7Y1: return matrix.get(Color.BLUE)[7];
+            case O6B8Y2: return matrix.get(Color.BLUE)[8];
+            default: return null;
+        }
+    }
+
+    // return the color on the white-yellow side of this piece
+    public Color getGamma(Piece p){
+        switch(p){
+            case R0G2W0: return matrix.get(Color.WHITE)[0];
+            case G1W1: return matrix.get(Color.WHITE)[1];
+            case O2G0W2: return matrix.get(Color.WHITE)[2];
+            case R1W3: return matrix.get(Color.WHITE)[3];
+            case W4: return matrix.get(Color.WHITE)[4];
+            case O1W5: return matrix.get(Color.WHITE)[5];
+            case R2B0W6: return matrix.get(Color.WHITE)[6];
+            case B1W7: return matrix.get(Color.WHITE)[7];
+            case O0B2W8: return matrix.get(Color.WHITE)[8];
+            case R3G5: return null;
+            case G4: return null;
+            case O5G3: return null;
+            case R4: return null;
+            case NULL: return null;
+            case O4: return null;
+            case R5B3: return null;
+            case B4: return null;
+            case O3B5: return null;
+            case R6G8Y6: return matrix.get(Color.YELLOW)[6];
+            case G7Y7: return matrix.get(Color.YELLOW)[7];
+            case O8G6Y8: return matrix.get(Color.YELLOW)[8];
+            case R7Y3: return matrix.get(Color.YELLOW)[3];
+            case Y4: return matrix.get(Color.YELLOW)[4]; 
+            case O7Y5: return matrix.get(Color.YELLOW)[5];
+            case R8B6Y0: return matrix.get(Color.YELLOW)[0];
+            case B7Y1: return matrix.get(Color.YELLOW)[1];
+            case O6B8Y2: return matrix.get(Color.YELLOW)[2];
+            default: return null;
+        }
     }
 
 }

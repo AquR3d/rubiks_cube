@@ -36,6 +36,17 @@ public class CubeAlgorithm {
         // if neither of these are yellow-white
         if (!(isYellowWhite(yellow) && isYellowWhite(white))) return false;
 
+        // check if middle section edges have matching alphas and betas throughout
+        Piece[] middle = {Piece.R3G5, Piece.O5G3, Piece.R5B3, Piece.O3B5};
+        for (Piece p : middle){
+            // Check alpha
+            Color alpha = instance.getAlpha(p);
+            if (!(alpha == Color.RED || alpha == Color.ORANGE)){ return false; }
+            // Check beta
+            Color beta = instance.getBeta(p);
+            if (!(beta == Color.BLUE || beta == Color.GREEN)){ return false; }
+        }
+
         // Check 4 corner triples
 
 
@@ -48,7 +59,7 @@ public class CubeAlgorithm {
 
         for (int i = 0; i < size; i++){
             // if not yellow or white...
-            if (!(face[i].toString().equals("W") || face[i].toString().equals("Y"))){
+            if (!(face[i] == Color.WHITE || face[i] == Color.YELLOW)){
                 return false;
             }
         }
@@ -84,83 +95,18 @@ public class CubeAlgorithm {
         Color[] yellow = matrix.get(Color.YELLOW);
         Color[] white = matrix.get(Color.WHITE);
 
-        
+        // Define parameters for corner locations.
+        int i = 0;
+        int[] indices = {-1, -1}; // corner 1 & 2
+        Color[] faces = {null, null}; // corner 1 & 2
 
+        // Get corners
+        
         
 
         // Identify type of property to check for...
 
 
 
-    }
-
-    /**
-     * @description Returns true when the associated corner of the cube instance matches the alpha beta colors.  Returns false otherwise.
-     * Will help identify G_PRIME.
-     * 
-     * @preconditions
-     * The yellow & white face on @param matrix must already be checked as to be fully yellow or white or both.
-     * idx must be in-between 0-8 inclusive.
-     * 
-     * @param matrix the cube instance
-     * @param alpha defined exactly as followsChargeProperty()
-     * @param beta defined exactly as followsChargeProperty()
-     * @param idx defines the location of which corner to contest on @param face
-     * @param face The yellow or white face where this corner is on @param matrix
-     * @return true when the associated corner has this alpha & beta color. false otherwise.
-     */
-    private boolean hasAlphaBeta(Map<Color, Color[]> matrix, Color alpha, Color beta, int idx, Color face){
-
-        // Check valid index.
-        if (!(idx == 0 || idx == 2 || idx == 6 || idx == 8)) return false;
-
-        // Get the colors of the contested corner...
-        Color _alpha = null, _beta = null;
-        if (face.equals(Color.YELLOW)){
-
-            switch(idx){
-                case 0:
-                    _alpha = matrix.get(Color.RED)[0];
-                    _beta = matrix.get(Color.GREEN)[2];
-                    break;
-                case 2:
-                    _alpha =  matrix.get(Color.ORANGE)[2];
-                    _beta = matrix.get(Color.GREEN)[0];
-                    break;
-                case 6:
-                    _alpha = matrix.get(Color.RED)[2];
-                    _beta = matrix.get(Color.BLUE)[0];
-                    break;
-                case 8:
-                    _alpha = matrix.get(Color.ORANGE)[0];
-                    _beta = matrix.get(Color.BLUE)[2];
-                    break;
-            }
-        } else if (face.equals(Color.WHITE)){
-            switch(idx){
-                case 0:
-                    _alpha = matrix.get(Color.RED)[8];
-                    _beta = matrix.get(Color.BLUE)[6];
-                    break;
-                case 2:
-                    _alpha =  matrix.get(Color.ORANGE)[6];
-                    _beta = matrix.get(Color.BLUE)[8];
-                    break;
-                case 6:
-                    _alpha = matrix.get(Color.RED)[6];
-                    _beta = matrix.get(Color.GREEN)[8];
-                    break;
-                case 8:
-                    _alpha = matrix.get(Color.ORANGE)[8];
-                    _beta = matrix.get(Color.GREEN)[6];
-                    break;
-            }
-        } else {
-            return false;
-        }
-
-        if (_alpha == null || _beta == null) return false;
-
-        return _alpha.equals(alpha) && _beta.equals(beta);
     }
 }

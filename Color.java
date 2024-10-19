@@ -29,8 +29,4 @@ public enum Color{
             default: return null;
         }
     }
-
-    public boolean equals(Color other){
-        return this.toString().equals(other.toString());
-    }
 }
