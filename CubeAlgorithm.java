@@ -18,14 +18,18 @@ public class CubeAlgorithm {
         solved = new Cube();
     }
 
-    public String[] solve(){
+    public ArrayList<String> solve(){
 
         // gimme scramble
 
         return null;
     }
 
-    public boolean isG_PRIME(Cube instance){
+    public ArrayList<String> solveToG_PRIME(Cube instance){
+        return null;
+    }
+
+    public static boolean isG_PRIME(Cube instance){
 
         // -= CHECK NON-CORNER TRIPLE PROPERTIES =-
 
@@ -102,7 +106,7 @@ public class CubeAlgorithm {
         if (!(followsChargeProperty(instance, redGreen[0], redGreen[1]) && followsChargeProperty(instance, redBlue[0], redBlue[1])
             && followsChargeProperty(instance, orangeBlue[0], orangeBlue[1]) && followsChargeProperty(instance, orangeGreen[0], orangeGreen[1]))) return false;
         // else... return true because all properties came out to be true!
-        
+
         return true;
     }
 
@@ -119,7 +123,7 @@ public class CubeAlgorithm {
      * @param betaC corner2 of triple (order doesn't matter)
      * @return Returns true if this triple follows their associated charge property.  False otherwise.
      **/ 
-    private boolean followsChargeProperty(Cube instance, Piece alphaC, Piece betaC){
+    private static boolean followsChargeProperty(Cube instance, Piece alphaC, Piece betaC){
 
         /**
          * Check positive property = When alphaC & betaC are on the same face on the same side, or on opposing faces on opp. sides

@@ -5,12 +5,11 @@ public class Main{
 
         Cube cube = new Cube();
         
-        //cube.scramble();s
-        cube.scramble(5);
-        cube.turn("R2");
+        cube.scramble("R\'");
 
         System.out.println(cube);
-
+        
+        System.out.println(CubeAlgorithm.isG_PRIME(cube));
         
             
     }
