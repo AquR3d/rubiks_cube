@@ -27,43 +27,82 @@ public class CubeAlgorithm {
 
     public boolean isG_PRIME(Cube instance){
 
-        Map<Color, Color[]> matrix = instance.getMatrix();
+        // -= CHECK NON-CORNER TRIPLE PROPERTIES =-
 
-        // Check 4 edge triples by checking white and yellow
-        Color[] yellow = matrix.get(Color.YELLOW);
-        Color[] white = matrix.get(Color.WHITE);
+        // *check yellow-white gamma properties*
+        Piece[] topAndBottom = {Piece.R0G2W0, Piece.G1W1, Piece.O2G0W2, Piece.R1W3, Piece.O1W5, Piece.R2B0W6, Piece.B1W7, Piece.O0B2W8,
+                                Piece.R6G8Y6, Piece.G7Y7, Piece.O8G6Y8, Piece.R7Y3, Piece.O7Y5, Piece.R8B6Y0, Piece.B7Y1, Piece.O6B8Y2};
+        // for each top-bottom side of the yellow and white faces...
+        for (Piece p : topAndBottom){
+            Color gamma = instance.getGamma(p);
+            // if the gamma of this piece is not yellow, white, or nothing... return false
+            if (!(gamma == null || gamma == Color.YELLOW || gamma == Color.WHITE)) return false;
+        }
 
-        // if neither of these are yellow-white
-        if (!(isYellowWhite(yellow) && isYellowWhite(white))) return false;
+
+
+        // -= CHECK 4 CORNER-TRIPLE PROPERTIES =-
 
         // check if middle section edges have matching alphas and betas throughout
         Piece[] middle = {Piece.R3G5, Piece.O5G3, Piece.R5B3, Piece.O3B5};
-        for (Piece p : middle){
+        for (int e = 0; e < middle.length; e++){
             // Check alpha
-            Color alpha = instance.getAlpha(p);
+            Color alpha = instance.getAlpha(middle[e]);
             if (!(alpha == Color.RED || alpha == Color.ORANGE)){ return false; }
             // Check beta
-            Color beta = instance.getBeta(p);
+            Color beta = instance.getBeta(middle[e]);
             if (!(beta == Color.BLUE || beta == Color.GREEN)){ return false; }
         }
 
-        // Check 4 corner triples
+        // *check positive-negative properties*
 
+        // store each triplet corners
+        Piece[] redGreen = new Piece[2];
+        Piece[] redBlue = new Piece[2];
+        Piece[] orangeBlue = new Piece[2];
+        Piece[] orangeGreen = new Piece[2];
+        int rg = 0, rb = 0, ob = 0, og = 0;
 
-        return true;
-    }
+        // Identify locations of triplets.  Divised into corner triple groups RED-GREEN, RED-BLUE, ORANGE-GREEN, ORANGE-BLUE.
+        Piece[] corners = {Piece.R0G2W0, Piece.O2G0W2, Piece.R2B0W6, Piece.O0B2W8, Piece.R6G8Y6, Piece.O8G6Y8, Piece.R8B6Y0, Piece.O6B8Y2};
+        // for each corner of the cube... identify & store which corners are apart of which corner triple group...
+        for (int c = 0; c < corners.length; c++){
+            // get colors of the contested corner...
+            Color alpha = instance.getAlpha(corners[c]);
+            Color beta = instance.getBeta(corners[c]);
 
-    // This method helps identify G_PRIME.  Checks if a face has only yellow or white or both colors.
-    private boolean isYellowWhite(Color[] face){
-        int size = face.length;
-
-        for (int i = 0; i < size; i++){
-            // if not yellow or white...
-            if (!(face[i] == Color.WHITE || face[i] == Color.YELLOW)){
-                return false;
+            // Classify this corner based off of their alpha & beta colors, and store it into the associated group...
+            if (alpha == Color.RED || beta == Color.RED){
+                if (alpha == Color.BLUE || beta == Color.BLUE){
+                    if (rb > 1) return false; // failsafe... should generally never happen
+                    redBlue[rb] = corners[c]; // store variable
+                    rb++; // store another one later...
+                } else if (alpha == Color.GREEN || beta == Color.GREEN){
+                    if (rg > 1) return false;
+                    redGreen[rg] = corners[c];
+                    rg++;
+                }
+            } else if (alpha == Color.ORANGE || beta == Color.ORANGE){
+                if (alpha == Color.BLUE || beta == Color.BLUE){
+                    if (ob > 1) return false;
+                    orangeBlue[ob] = corners[c];
+                    ob++;
+                } else if (alpha == Color.GREEN || beta == Color.GREEN){
+                    if (og > 1) return false;
+                    orangeGreen[og] = corners[c];
+                    og++;
+                }
             }
         }
 
+        // if triplets weren't successful... return false
+        if (!(rg == 2 && rb == 2 && ob == 2 && og == 2)) return false; // also shouldn't generally happen... but failsafe regardless
+
+        // if any of the corner triples does not follow its charge property... return false
+        if (!(followsChargeProperty(instance, redGreen[0], redGreen[1]) && followsChargeProperty(instance, redBlue[0], redBlue[1])
+            && followsChargeProperty(instance, orangeBlue[0], orangeBlue[1]) && followsChargeProperty(instance, orangeGreen[0], orangeGreen[1]))) return false;
+        // else... return true because all properties came out to be true!
+        
         return true;
     }
 
@@ -72,17 +111,15 @@ public class CubeAlgorithm {
      * This method helps identify G_PRIME.  Checks if this corner triple has a negative or positive property defined in the function.
      * 
      * @preconditions
-     * The yellow & white face on @param matrix must already be checked as to be fully yellow or white or both.
+     * @param alphaC and @param betaC must ALREADY be checked to be apart of the same corner triple.  They're gammas must also already be checked to be yellow for one, and white for the ohter.
+     * This allow us to say that the gamma of both pieces ON THE CUBE are ALWAYS different, to avoid further amibguity of checking this property again when it has been checked in isG_PRIME().
      * 
-     * @return
-     * Will return true if it follows the negative or positive property for G_PRIME.
-     * returns false otherwise...
-     * 
-     * A corner triple is defined by the 2 colors it shares across 3 pieces.  In this function, that will be defined
-     * by @param alpha @param beta...  The alpha color will be RED or ORANGE, but the beta will be BLUE or GREEN.
-     * ex. YELLOW-GREEN-ORANGE(corner/alphaC) & GREEN-ORANGE(edge) & WHITE-GREEN-ORANGE(corner/betaC) is a corner triple.
+     * @param instance the cube where this contested triple is on...
+     * @param alphaC corner1 of triple (order doesn't matter)
+     * @param betaC corner2 of triple (order doesn't matter)
+     * @return Returns true if this triple follows their associated charge property.  False otherwise.
      **/ 
-    private boolean followsChargeProperty(Map<Color, Color[]> matrix, Color alpha, Color beta){
+    private boolean followsChargeProperty(Cube instance, Piece alphaC, Piece betaC){
 
         /**
          * Check positive property = When alphaC & betaC are on the same face on the same side, or on opposing faces on opp. sides
@@ -91,22 +128,46 @@ public class CubeAlgorithm {
          * ex. corners are diagonal from eachother on any same face
          **/
 
-        // Find alphaC & betaC... location will be defined by the yellow & white face
-        Color[] yellow = matrix.get(Color.YELLOW);
-        Color[] white = matrix.get(Color.WHITE);
-
-        // Define parameters for corner locations.
-        int i = 0;
-        int[] indices = {-1, -1}; // corner 1 & 2
-        Color[] faces = {null, null}; // corner 1 & 2
-
-        // Get corners
-        
-        
-
         // Identify type of property to check for...
+        Color a_alpha = Piece.getAlpha(alphaC); // Piece.getAlpha(Piece p) differs from Cube.object.getAlpha(Piece p) as  Piece.getAlpha(Piece p) gets p's original alpha color on the solved cube.
+        Color a_beta = Piece.getBeta(alphaC);
+        Color a_gamma = Piece.getGamma(alphaC); // Piece.getGamma(Piece p) returns the original yellow-white color of p on the solved cube.
+
+        Color b_alpha = Piece.getAlpha(betaC);
+        Color b_beta = Piece.getBeta(betaC);
+        Color b_gamma = Piece.getGamma(betaC);
+
+        boolean positive = true;
+
+        // CHECK if this triple is a NEGATIVE property...
+
+        // check if one side is the same, and the other 2 are different...
+        if (a_alpha == b_alpha){
+            if (a_beta != b_beta && a_gamma != b_gamma){ positive = false; }
+        } else if (a_beta == b_beta){
+            if (a_alpha != b_alpha && a_gamma != b_gamma){ positive = false; }
+        } else if (a_gamma == b_gamma){
+            if (a_alpha != b_alpha && a_beta != b_beta){ positive = false; }
+        }
+        // if not... then this is a positive property
 
 
+        // SEE if this triple FOLLOWS its corresponding +/- property on the instance...
+        a_alpha = instance.getAlpha(alphaC); // change these variables to store the alpha & betas colors that it is CURRENTLY on @param Cube instance.
+        a_beta = instance.getBeta(alphaC);
 
+        b_alpha = instance.getAlpha(betaC);
+        b_beta = instance.getBeta(betaC);
+        // Check if the instance follows the +/- property accordingly to be apart of G_PRIME...
+        if (positive){
+            // if alphas are not the same as eachother or betas are not the same as easchother... return false as it does not follow the positive property
+            if (a_alpha != b_alpha || a_beta != b_beta) return false;
+        } else {
+            // if alphas are the same as eachother or betas are the same as easchother... return false as it does not follow the negative property.
+            if (a_alpha == b_alpha || a_beta == b_beta) return false;
+        }
+        // else... return true!
+
+        return true;
     }
 }
