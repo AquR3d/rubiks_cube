@@ -10,7 +10,11 @@ import java.util.*;
  */
 public class CubeAlgorithm {
     private Cube solved;
-    private Cube scramble;
+    public Cube scramble;
+
+    public ArrayList<String> sequence;
+    private int maxItrs = 5; // 6 makes me run out of memory...
+    public int itrs = 0;
     
 
     public CubeAlgorithm(Cube other){
@@ -25,8 +29,60 @@ public class CubeAlgorithm {
         return null;
     }
 
-    public ArrayList<String> solveToG_PRIME(Cube instance){
-        return null;
+    public boolean solveToG_PRIME(Cube instance){
+
+        instance.prev = null; // IMPORTANT
+
+        if (isG_PRIME(instance)){
+            return true;
+        }
+
+        Queue<Cube> q = new LinkedList<>();
+        q.add(instance);
+
+        while (!q.isEmpty() && q.peek().sequence.size() < maxItrs){
+            Cube copy = q.poll();
+            Cube clone;
+
+            // for each face
+            for (Color face : Color.values()){
+                // optimizations
+                if (face == copy.prev) continue; 
+                if (Color.opp(face) == copy.prev && Color.isDom(copy.prev)) continue;
+
+                clone = new Cube(copy);
+                clone.turn(face, true);
+                clone.sequence.add(face.toString());
+                if (isG_PRIME(clone)){
+                    scramble = clone;
+                    return true;
+                }
+                q.add(clone);
+
+                clone = new Cube(copy);
+                clone.turn(face, false);
+                clone.sequence.add(face.toString() + "\'");
+                if (isG_PRIME(clone)){
+                    scramble = clone;
+                    return true;
+                }
+                q.add(clone);
+
+                clone = new Cube(copy);
+                clone.turn(face, true);
+                clone.turn(face, true);
+                clone.sequence.add(face.toString() + "2");
+                if (isG_PRIME(clone)){
+                    scramble = clone;
+                    return true;
+                }
+                q.add(clone);
+
+                
+            }
+        }
+
+        return false;
     }
 
     public static boolean isG_PRIME(Cube instance){

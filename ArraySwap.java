@@ -7,6 +7,8 @@
  * The Cube data structure class uses this class in order to accomplish
  * the representation of configurations of a cube, like turning.
  */
+import java.util.*;
+
 public abstract class ArraySwap{
     // swaps these elements in the array
     public static void swap(Object[] array, int idx1, int idx2){
@@ -45,5 +47,19 @@ public abstract class ArraySwap{
             swap(arr1, idx1, arr2, idx2);
             swap(arr2, idx2, arr3, idx3);
         }
+    }
+
+    // returns the common object between the arrays.. null if not found
+    public static Object hasCommons(ArrayList<Object> arr1, ArrayList<Object> arr2){
+
+        for (int i = 0; i < arr1.size(); i++){
+            for (int j = 0; j < arr2.size(); j++){
+                if (arr1.get(i).equals(arr2.get(j))){
+                    return arr1.get(i);
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -29,4 +29,28 @@ public enum Color{
             default: return null;
         }
     }
+
+    public static Color opp(Color other){
+        switch(other){
+            case RED: return ORANGE;
+            case BLUE: return GREEN;
+            case WHITE: return YELLOW;
+            case YELLOW: return WHITE;
+            case ORANGE: return RED;
+            case GREEN: return BLUE;
+            default: return null;
+        }
+    }
+
+    public static boolean isDom(Color other){
+        switch(other){
+            case RED: return true;
+            case BLUE: return true;
+            case WHITE: return true;
+            case YELLOW: return false;
+            case ORANGE: return false;
+            case GREEN: return false;
+            default: return false;
+        }
+    }
 }

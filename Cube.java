@@ -44,9 +44,12 @@ public class Cube {
     // the KEY will represent the side color aka the center color BC CENTER COLOR SHALL STAY CONSISTENT
     // the VALUE will be the pieces on this face according to the "CUBE_MAP"
     private Map<Color, Color[]> matrix;
+    public Color prev; // the most recent face that was turned... for alg
+    public ArrayList<String> sequence; // for alg
 
     // make default cube
     public Cube(){
+        sequence = new ArrayList<>(); // for alg
         toDefault();
     }
 
@@ -67,6 +70,8 @@ public class Cube {
         for (Color c : other.matrix.keySet()){
             this.matrix.put(c, other.matrix.get(c).clone());
         }
+
+        sequence = (ArrayList<String>)other.sequence.clone(); // for alg
     }
 
     public Cube(String sequence){
@@ -117,6 +122,7 @@ public class Cube {
     // clockwise is considered looking at a face on the CUBE_MAP and rotating it clockwise
     public boolean turn(Color faceToturn, boolean clockwise){
         // i'm not smart enough to make code reusable for all 12 different turns
+        
 
         faceturn(faceToturn, clockwise);
         switch (faceToturn){
@@ -200,6 +206,8 @@ public class Cube {
 
     // turns just the face...
     private void faceturn(Color faceToturn, boolean clockwise){
+        prev = faceToturn; // added
+
         Color[] face = matrix.get(faceToturn);
 
         ArraySwap.swapFour(face, 0, 2, 8, 6, clockwise);
