@@ -14,7 +14,8 @@ public class CubeAlgorithm {
 
     private int maxItrs = 6; // 6 makes me run out of memory...
     private int maxInstances = 1000000; // take 2726049 instances is max memory LOL
-    public int itrs = 0;
+    public String sequence;
+
     
 
     public CubeAlgorithm(Cube other){
@@ -106,7 +107,21 @@ public class CubeAlgorithm {
             }
 
             // compare with solved cube queue
-            Cube common = (Cube)ArraySwap.hasCommons(q, sq);
+            Cube[] common = (Cube[])ArraySwap.hasCommons(q, sq);
+
+            if (common != null){
+
+                String reverse;
+
+                // reverse solved cube sequence
+                String[] reverseArr = common[1].sequence.split(" ");
+                
+
+
+                sequence = common[0].sequence;
+                
+                return true;
+            }
 
             // add new instances of solved cube queue
 

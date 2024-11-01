@@ -50,12 +50,12 @@ public abstract class ArraySwap{
     }
 
     // returns the common object between the arrays.. null if not found
-    public static Object hasCommons(LinkedList<Object> arr1, LinkedList<Object> arr2){
+    public static Object[] hasCommons(LinkedList<Object> arr1, LinkedList<Object> arr2){
 
         for (int i = 0; i < arr1.size(); i++){
             for (int j = 0; j < arr2.size(); j++){
                 if (arr1.get(i).equals(arr2.get(j))){
-                    return arr1.get(i);
+                    return new Object[]{arr1.get(i), arr2.get(j)};
                 }
             }
         }

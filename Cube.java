@@ -393,6 +393,24 @@ public class Cube {
         return msg;
     }
 
+    // reverse move sequence
+    public static String reverseSequence(String sequence){
+
+        String result = "";
+
+        String[] arr = sequence.split(" ");
+        for (int i = arr.length-1; i >= 0; i--){
+            // add reverse move method
+        }
+
+        return null;
+    }
+
+    public static String reverseMove(String move){
+        // return reversed
+        return null;
+    }
+
     // return the color on the red-orange side of this piece
     public static Color getAlpha(Cube other, Piece p){
         Map<Color, Color[]> matrix = other.matrix;
