@@ -401,13 +401,27 @@ public class Cube {
         String[] arr = sequence.split(" ");
         for (int i = arr.length-1; i >= 0; i--){
             // add reverse move method
+            result += reverseMove(arr[i]) + " ";
         }
+        result = result.substring(0, result.length()-1);
+
+        if (result.length() > 1) return result;
 
         return null;
     }
 
     public static String reverseMove(String move){
-        // return reversed
+        if (move == null || move.length() < 1 || move.length() > 2) return null;
+        Color face = Color.fromString(move.substring(0, 1));
+        if (face == null) return null;
+
+        String moveType = move.substring(1);
+
+        switch(moveType){
+            case "\'": return face.toString();
+            case "": return face.toString() + "\'";
+            case "2": return face.toString() + "2";
+        }
         return null;
     }
 

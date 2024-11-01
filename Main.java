@@ -29,6 +29,8 @@ public class Main{
             System.out.println(alg.scramble);
             System.out.println(alg.scramble.sequence);
         }
+
+        //System.out.println(Cube.reverseSequence("R' W G2 B2 O O' B' Y' Y2"));
         
             
     }
