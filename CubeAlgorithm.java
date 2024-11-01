@@ -12,8 +12,8 @@ public class CubeAlgorithm {
     private Cube solved;
     public Cube scramble;
 
-    public ArrayList<String> sequence;
-    private int maxItrs = 5; // 6 makes me run out of memory...
+    private int maxItrs = 6; // 6 makes me run out of memory...
+    private int maxInstances = 1000000; // take 2726049 instances is max memory LOL
     public int itrs = 0;
     
 
@@ -22,11 +22,8 @@ public class CubeAlgorithm {
         solved = new Cube();
     }
 
-    public ArrayList<String> solve(){
-
-        // gimme scramble
-
-        return null;
+    public boolean solveG_PRIME(Cube instance){
+        return false;
     }
 
     public boolean solveToG_PRIME(Cube instance){
@@ -40,48 +37,73 @@ public class CubeAlgorithm {
         Queue<Cube> q = new LinkedList<>();
         q.add(instance);
 
-        while (!q.isEmpty() && q.peek().sequence.size() < maxItrs){
+        Cube clone = null;
+        while (!q.isEmpty() && q.peek().sequence.split(" ").length < maxItrs && q.size() < maxInstances){
             Cube copy = q.poll();
-            Cube clone;
 
             // for each face
             for (Color face : Color.values()){
                 // optimizations
                 if (face == copy.prev) continue; 
                 if (Color.opp(face) == copy.prev && Color.isDom(copy.prev)) continue;
+                
+                // last optimization i could think of
+                // add if prev prev is this one && prev was opp
+                if (copy.sequence.length() > 3 && Color.opp(face) == copy.prev){ // if the sequence has at least 1 move...
+                    String[] seq = copy.sequence.split(" ");
+                    Color prevprev = Color.fromString(seq[seq.length-2].substring(0, 1));
+
+                    if (prevprev == face) continue;
+                }
 
                 clone = new Cube(copy);
-                clone.turn(face, true);
-                clone.sequence.add(face.toString());
+                Cube.turn(clone, face, true);
+                clone.sequence += face.toString() + " ";
                 if (isG_PRIME(clone)){
                     scramble = clone;
                     return true;
                 }
                 q.add(clone);
 
+                if (q.size() >= maxInstances){
+                    scramble = clone;
+                    return false;
+                }
+
                 clone = new Cube(copy);
-                clone.turn(face, false);
-                clone.sequence.add(face.toString() + "\'");
+                Cube.turn(clone, face, false);
+                clone.sequence += face.toString() + "\' ";
                 if (isG_PRIME(clone)){
                     scramble = clone;
                     return true;
                 }
                 q.add(clone);
 
+                if (q.size() >= maxInstances){
+                    scramble = clone;
+                    return false;
+                }
+
                 clone = new Cube(copy);
-                clone.turn(face, true);
-                clone.turn(face, true);
-                clone.sequence.add(face.toString() + "2");
+                Cube.turn(clone, face, true);
+                Cube.turn(clone, face, true);
+                clone.sequence += face.toString() + "2 ";
                 if (isG_PRIME(clone)){
                     scramble = clone;
                     return true;
                 }
                 q.add(clone);
+
+                if (q.size() >= maxInstances){
+                    scramble = clone;
+                    return false;
+                }
 
                 
             }
         }
 
+        scramble = clone;
         return false;
     }
 
@@ -94,7 +116,7 @@ public class CubeAlgorithm {
                                 Piece.R6G8Y6, Piece.G7Y7, Piece.O8G6Y8, Piece.R7Y3, Piece.O7Y5, Piece.R8B6Y0, Piece.B7Y1, Piece.O6B8Y2};
         // for each top-bottom side of the yellow and white faces...
         for (Piece p : topAndBottom){
-            Color gamma = instance.getGamma(p);
+            Color gamma = Cube.getGamma(instance, p);
             // if the gamma of this piece is not yellow, white, or nothing... return false
             if (!(gamma == null || gamma == Color.YELLOW || gamma == Color.WHITE)) return false;
         }
@@ -107,10 +129,10 @@ public class CubeAlgorithm {
         Piece[] middle = {Piece.R3G5, Piece.O5G3, Piece.R5B3, Piece.O3B5};
         for (int e = 0; e < middle.length; e++){
             // Check alpha
-            Color alpha = instance.getAlpha(middle[e]);
+            Color alpha = Cube.getAlpha(instance, middle[e]);
             if (!(alpha == Color.RED || alpha == Color.ORANGE)){ return false; }
             // Check beta
-            Color beta = instance.getBeta(middle[e]);
+            Color beta = Cube.getBeta(instance, middle[e]);
             if (!(beta == Color.BLUE || beta == Color.GREEN)){ return false; }
         }
 
@@ -128,8 +150,8 @@ public class CubeAlgorithm {
         // for each corner of the cube... identify & store which corners are apart of which corner triple group...
         for (int c = 0; c < corners.length; c++){
             // get colors of the contested corner...
-            Color alpha = instance.getAlpha(corners[c]);
-            Color beta = instance.getBeta(corners[c]);
+            Color alpha = Cube.getAlpha(instance, corners[c]);
+            Color beta = Cube.getBeta(instance, corners[c]);
 
             // Classify this corner based off of their alpha & beta colors, and store it into the associated group...
             if (alpha == Color.RED || beta == Color.RED){
@@ -213,11 +235,11 @@ public class CubeAlgorithm {
 
 
         // SEE if this triple FOLLOWS its corresponding +/- property on the instance...
-        a_alpha = instance.getAlpha(alphaC); // change these variables to store the alpha & betas colors that it is CURRENTLY on @param Cube instance.
-        a_beta = instance.getBeta(alphaC);
+        a_alpha = Cube.getAlpha(instance, alphaC); // change these variables to store the alpha & betas colors that it is CURRENTLY on @param Cube instance.
+        a_beta = Cube.getBeta(instance, alphaC);
 
-        b_alpha = instance.getAlpha(betaC);
-        b_beta = instance.getBeta(betaC);
+        b_alpha = Cube.getAlpha(instance, betaC);
+        b_beta = Cube.getBeta(instance, betaC);
         // Check if the instance follows the +/- property accordingly to be apart of G_PRIME...
         if (positive){
             // if alphas are not the same as eachother or betas are not the same as easchother... return false as it does not follow the positive property

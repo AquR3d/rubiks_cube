@@ -17,7 +17,7 @@ public class Main{
 
         //Cube cube = new Cube("R' W O2 G' Y2 G'");
         Cube cube = new Cube();
-        cube.scramble(6, 20, true);
+        Cube.scramble(cube, 6, 20, true);
 
         System.out.println(cube);
         
@@ -25,8 +25,10 @@ public class Main{
         CubeAlgorithm alg = new CubeAlgorithm(cube);
 
         System.out.println(alg.solveToG_PRIME(cube));
-        System.out.println(alg.scramble);
-        System.out.println(alg.scramble.sequence);
+        if (alg.scramble != null){
+            System.out.println(alg.scramble);
+            System.out.println(alg.scramble.sequence);
+        }
         
             
     }
