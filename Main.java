@@ -15,22 +15,35 @@ public class Main{
          * 
          */
 
-        //Cube cube = new Cube("R' W O2 G' Y2 G'");
-        Cube cube = new Cube();
-        Cube.scramble(cube, 6, 20, true);
+        /**
+         * g-prime scrambles that get solved
+         * [B2, W', Y, O2, B2, Y', B2] - O2 Y' W B2 R2 Y R2
+         */
 
-        System.out.println(cube);
+        //Cube cube = new Cube("R' W O2 G' Y2 G'");
+        //Cube cube = new Cube();
+        //Cube.scramble(cube, 6, 20, true);
+
+        //System.out.println(cube);
         
         //System.out.println(CubeAlgorithm.isG_PRIME(cube));
-        CubeAlgorithm alg = new CubeAlgorithm(cube);
+        CubeAlgorithm alg = new CubeAlgorithm(null);
 
-        System.out.println(alg.solveToG_PRIME(cube));
+        /*System.out.println(alg.solveToG_PRIME(cube));
         if (alg.scramble != null){
             System.out.println(alg.scramble);
             System.out.println(alg.scramble.sequence);
-        }
+        }*/
 
         //System.out.println(Cube.reverseSequence("R' W G2 B2 O O' B' Y' Y2"));
+
+        Cube gprime = new Cube();
+        //Cube.scramble(gprime, "R Y W G2 B2 Y' W' O");
+        gprime = CubeAlgorithm.makeG_PRIME(6, 20);
+        System.out.println(gprime);
+
+        System.out.println(alg.solveG_PRIME(gprime));
+        System.out.println(alg.sequence);
         
             
     }

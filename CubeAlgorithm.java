@@ -23,23 +23,103 @@ public class CubeAlgorithm {
         solved = new Cube();
     }
 
+    // returns the common object between the arrays.. null if not found
+    public static Cube[] hasCommons(LinkedList<Cube> arr1, LinkedList<Cube> arr2){
+
+        // INCREASE EFFICIENCY WITH BINARY SEARCH AND MERGE SORT
+
+        for (int i = 0; i < arr1.size(); i++){
+            for (int j = 0; j < arr2.size(); j++){
+                if (arr1.get(i).equals(arr2.get(j))){
+                    System.out.println(arr1.get(i));
+                    System.out.println(arr2.get(j));
+                    return new Cube[]{arr1.get(i), arr2.get(j)};
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static Cube makeG_PRIME(int min, int max){
+
+        // setup randoms
+        int numTurns = (int)((max - min + 1) * Math.random()) + min;
+        int turnFace = 0, turnType = 0;
+        Color face = null;
+
+        // scramble sequence
+        String[] scrambleSeq = new String[numTurns];
+
+        for (int t = 0; t < numTurns; t++){
+
+            // setup random
+            turnFace = (int)(6 * Math.random());
+            turnType = (int)(3 * Math.random());
+
+            
+            face = Color.fromInt(turnFace);
+
+            // modified for gprime set
+            switch(face){
+                case RED:
+                case BLUE:
+                case GREEN:
+                case ORANGE:
+                    turnType = 2;
+                    break;
+                case WHITE:
+                case YELLOW:
+                default: break;
+            }
+
+            // optimizing turns
+            // if we have at least one turn && the previous move and this move have the same turn face...
+            if (t > 0 && scrambleSeq[t-1].substring(0,1).equals(face.toString())){
+                // try doing this move again.
+                t--;
+                continue;
+            }
+
+            String currTurn = "";
+            scrambleSeq[t] = currTurn;
+
+            scrambleSeq[t] += face.toString();
+
+            switch (turnType){
+                case 1:
+                    scrambleSeq[t] += "\'";
+                    break;
+                case 2:
+                    scrambleSeq[t] += "2";
+                    break;
+            }
+        }
+
+        System.out.println(Arrays.toString(scrambleSeq));
+
+        return new Cube(scrambleSeq);
+
+    }
+
     public boolean solveG_PRIME(Cube instance){
         instance.prev = null; // IMPORTANT
 
-        if (isG_PRIME(instance)){
-            return true;
+        if (!isG_PRIME(instance)){
+            return false;
         }
-
-        LinkedList<Cube> sq = new LinkedList<>();
-        sq.addLast(solved);
 
         LinkedList<Cube> q = new LinkedList<>();
         q.addLast(instance);
 
+        LinkedList<Cube> sq = new LinkedList<>();
+        sq.addLast(solved);
+
         Cube clone = null;
+        Cube copy = null;
+        Cube[] common = null;
         while (!q.isEmpty() && q.size() < maxInstances && !sq.isEmpty() && sq.size() < maxInstances){
-            Cube copy = q.getFirst();
-            q.removeFirst();
+            copy = q.poll();
 
             // for each face
             for (Color face : Color.values()){
@@ -62,8 +142,8 @@ public class CubeAlgorithm {
                     clone = new Cube(copy);
                     Cube.turn(clone, face, true);
                     clone.sequence += face.toString() + " ";
-                    if (isG_PRIME(clone)){
-                        scramble = clone;
+                    if (clone.equals(solved)){
+                        sequence = clone.sequence;
                         return true;
                     }
                     q.addLast(clone);
@@ -76,8 +156,8 @@ public class CubeAlgorithm {
                     clone = new Cube(copy);
                     Cube.turn(clone, face, false);
                     clone.sequence += face.toString() + "\' ";
-                    if (isG_PRIME(clone)){
-                        scramble = clone;
+                    if (clone.equals(solved)){
+                        sequence = clone.sequence;
                         return true;
                     }
                     q.addLast(clone);
@@ -92,7 +172,7 @@ public class CubeAlgorithm {
                 Cube.turn(clone, face, true);
                 Cube.turn(clone, face, true);
                 clone.sequence += face.toString() + "2 ";
-                if (isG_PRIME(clone)){
+                if (clone.equals(solved)){
                     scramble = clone;
                     return true;
                 }
@@ -102,31 +182,82 @@ public class CubeAlgorithm {
                     scramble = clone;
                     return false;
                 }
-
-                
             }
 
+            // PROBLEM, WE ARE COMPARING TOO SOON!!!!!
+
             // compare with solved cube queue
-            Cube[] common = (Cube[])ArraySwap.hasCommons(q, sq);
+            common = null; // remove garbage value
+            common = hasCommons(q, sq);
 
-            if (common != null){
-
-                String reverse;
-
-                // reverse solved cube sequence
-                String[] reverseArr = common[1].sequence.split(" ");
-                
-
-
-                sequence = common[0].sequence;
-                
+            if (common != null){ 
+                sequence = common[0].sequence + Cube.reverseSequence(common[1].sequence);
                 return true;
             }
 
+            copy = sq.poll();
             // add new instances of solved cube queue
+            // for each face
+            for (Color face : Color.values()){
+                // optimizations
+                if (face == copy.prev) continue; 
+                if (Color.opp(face) == copy.prev && Color.isDom(copy.prev)) continue;
+                
+                // last optimization i could think of
+                // add if prev prev is this one && prev was opp
+                if (copy.sequence.length() > 3 && Color.opp(face) == copy.prev){ // if the sequence has at least 1 move...
+                    String[] seq = copy.sequence.split(" ");
+                    Color prevprev = Color.fromString(seq[seq.length-2].substring(0, 1));
+
+                    if (prevprev == face) continue;
+                }
+
+                // do g_prime moveset
+                if (face == Color.WHITE || face == Color.YELLOW){
+
+                    clone = new Cube(copy);
+                    Cube.turn(clone, face, true);
+                    clone.sequence += face.toString() + " ";
+                    sq.addLast(clone);
+
+                    if (sq.size() >= maxInstances){
+                        scramble = clone;
+                        return false;
+                    }
+
+                    clone = new Cube(copy);
+                    Cube.turn(clone, face, false);
+                    clone.sequence += face.toString() + "\' ";
+                    sq.addLast(clone);
+
+                    if (sq.size() >= maxInstances){
+                        scramble = clone;
+                        return false;
+                    }
+                }
+
+                clone = new Cube(copy);
+                Cube.turn(clone, face, true);
+                Cube.turn(clone, face, true);
+                clone.sequence += face.toString() + "2 ";
+                sq.addLast(clone);
+
+                if (sq.size() >= maxInstances){
+                    scramble = clone;
+                    return false;
+                }
+            }
 
             // compare with gprime cube queue
+            common = null; // remove garbage value
+            common = hasCommons(q, sq);
+
+            if (common != null){
+                sequence = common[0].sequence + Cube.reverseSequence(common[1].sequence);
+                return true;
+            }
         }
+
 
         scramble = clone;
         return false;
@@ -208,7 +339,7 @@ public class CubeAlgorithm {
                 
             }
         }
-
+        
         scramble = clone;
         return false;
     }
