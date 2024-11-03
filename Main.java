@@ -17,25 +17,44 @@ public class Main{
 
         /**
          * g-prime scrambles that get solved
-         * B2 W' Y O2 B2 Y' B2 - (O2 Y' W B2 R2 Y R2 - B2 R2 Y' WG2 Y R2) (i somehow got 2 diff solutions AND THEY BOTH WORK?????)
+         * B2 W' Y O2 B2 Y' B2 - (O2 Y' W B2 R2 Y R2 - B2 R2 Y' W G2 Y R2) (i somehow got 2 diff solutions AND THEY BOTH WORK?????)
          * O2, B2, G2, Y2, R2, W', Y', G2 - B2 R2 W2 B2 W' Y' B2 R2
+         * [Y', G2, B2, R2, W, G2, Y2, O2, W, B2] - O2 B2 Y O2 Y2 B2 W B2 O2 W
+         * R2, B2, R2, W, Y', G2, B2, R2, G2, R2, G2 - R2 B2 Y W' B2 R2 B2
+         * R2, O2, R2, Y', R2, O2, R2, G2, W', Y', W', R2, O2 - O2 R2 Y W2 G2 O2 Y O2
+         * Y, O2, B2, G2, O2, W - Y' B2 R2 O2 null??  (null in this case was B2 W') // FIXED!!!
+         * B2, W2, B2, W', O2, W2, Y2, O2, Y', R2, G2, W - W' G2 R2 W B2 G2 Y G2 Y2 B2
+         * O2, R2, G2, W2, G2, O2, G2, B2, W, Y, B2 - B2 Y' W' G2 B2 R2 B2 Y2 B2
+         * O2, W2, O2, R2, B2, G2, R2, G2, W', Y2, R2, O2, R2, Y, R2, G2 - G2 R2 Y' O2 Y2 W G2 O2 B2 G2 W2 O2 (this one took a while... LIKE 1-5 MINS)
          */
 
-         CubeAlgorithm alg = new CubeAlgorithm(null);
+        /**
+         * full solves:
+         * B2, Y2, B, O', R, B' - B O R' B B2 Y Y B2 (double y because that was the connection point) (8 move solve)
+         * B2, Y, W', O, R2, O', Y', W, G', W, G2 - G2 W' G Y W' R2 W Y' B2 (9 move solve)
+         */
 
-        Cube cube = new Cube("R Y W G B2 W");
+        CubeAlgorithm alg = new CubeAlgorithm(null);
+
+        /*Cube cube = new Cube("R Y W G B2 W");
         System.out.println(cube);
         System.out.println(alg.solveToG_PRIME(cube));
-        System.out.println(alg.scramble.sequence);
+        System.out.println(alg.scramble.sequence);*/
 
-        Cube gprime = new Cube();
-        //Cube.scramble(gprime, "B2 W' Y O2 B2 Y' B2");
+        /*Cube gprime = new Cube();
+        //Cube.scramble(gprime, "Y O2 B2 G2 O2 W");
         gprime = CubeAlgorithm.makeG_PRIME(6, 20);
         System.out.println(gprime);
 
         System.out.println(alg.solveG_PRIME(gprime));
-        System.out.println(alg.gSequence);
-        
-            
+        System.out.println(alg.gSequence);*/
+
+        Cube cube = new Cube();
+        Cube.scramble(cube, 6, 20);
+        System.out.println(cube);
+
+        System.out.println(alg.kociemba_solve(cube));
+        System.out.println(alg.finalSeq);
+
     }
 }
