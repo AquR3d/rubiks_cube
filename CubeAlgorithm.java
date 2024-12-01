@@ -60,6 +60,8 @@ public class CubeAlgorithm {
         // Placeholder for the logic to solve the cross.
         // Implement actual cross-solving logic here.
 
+        // Solve each edge of the cross
+        String totalSeq = "";
         int crosses = 0;
         while(true){
 
@@ -69,14 +71,34 @@ public class CubeAlgorithm {
             // get solve to another part of the cross
             String seq = solveToCross(instance, crosses+1); // add method of breadth searcth to find solve
 
-            System.out.println(seq);
-
             // do solve
             Cube.scramble(instance, seq); // crosses should automatically update after
+
+            totalSeq += seq + " ";
         }
 
         // orientate appropriately to centers
+        int times = 0;
+        while(true){
+            
+            String seq = "";
 
+            // if centers are orientated
+            if (crossCompleted(instance)){
+                switch(times){
+                    case 1: seq += "W"; break;
+                    case 2: seq += "W2"; break;
+                    case 3: seq += "W'"; break;
+                }
+                totalSeq += seq + " ";
+                break;
+            }
+
+            times++;
+            Cube.turn(instance, Color.WHITE, true);
+        }
+
+        System.out.println(totalSeq);
 
         return true;
     }
@@ -107,6 +129,8 @@ public class CubeAlgorithm {
             while (!q.isEmpty() && q.size() < maxInstances && q.peek().sequence.split(" ").length <= qItr){
                 // get first in line to be iterated
                 copy = q.poll();
+
+                // this method might be optimized later to find shorter solution where cfop edges can be solved during another one's
 
                 // check for cross edges
                 if (crossEdged(copy) == cross) return copy.sequence;
@@ -155,14 +179,31 @@ public class CubeAlgorithm {
         return maxCrosses;
     }
 
+    private boolean crossCompleted(Cube instance){
+
+        // check each edge piece
+        if (Cube.getGamma(instance, Piece.R1W3) != Color.WHITE || Cube.getAlpha(instance, Piece.R1W3) != Color.RED) return false;
+        if (Cube.getGamma(instance, Piece.G1W1) != Color.WHITE || Cube.getBeta(instance, Piece.G1W1) != Color.GREEN) return false;
+        if (Cube.getGamma(instance, Piece.O1W5) != Color.WHITE || Cube.getAlpha(instance, Piece.O1W5) != Color.ORANGE) return false;
+        if (Cube.getGamma(instance, Piece.B1W7) != Color.WHITE || Cube.getBeta(instance, Piece.B1W7) != Color.BLUE) return false;
+
+        return true;
+    }
+
     /**
      * solves the first two layers (F2L) on the cube
      * returns true if successful, false if it fails to make progress
      */
-
     private boolean solveF2L(Cube instance) {
         // Placeholder for the logic to solve F2L.
         // Implement actual F2L-solving logic here.
+
+        // preconditions: cross has to be done
+        if (!crossCompleted(instance)) return false;
+
+
+
+
         return false;
     }
 
