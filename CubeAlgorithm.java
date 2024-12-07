@@ -9,11 +9,11 @@ import java.util.*;
  * the specified Cube instantiated within it.
  */
 public class CubeAlgorithm {
-    private Cube solved;
+    protected Cube solved;
     public Cube scramble;
 
-    private int maxItrs = 6; // 6 makes me run out of memory...
-    private int maxInstances = 1000000; // take 2726049 instances is max memory LOL
+    protected int maxItrs = 6; // 6 makes me run out of memory...
+    protected int maxInstances = 1000000; // take 2726049 instances is max memory LOL
     public String gSequence;
     public String sequence;
     public String finalSeq = null;
@@ -23,210 +23,6 @@ public class CubeAlgorithm {
     public CubeAlgorithm(Cube other){
         scramble = other;
         solved = new Cube();
-    }
-
-    public boolean solveUsingCFOP(Cube instance) {
-        // step 1: solve the cross
-        if (!solveCross(instance)) {
-            return false;
-        }
-
-        // step 2: solve the first two layers (F2L)
-        if (!solveF2L(instance)) {
-            return false;
-        }
-
-        // step 3: orient the last layer (OLL)
-        if (!solveOLL(instance)) {
-            return false;
-        }
-
-        // step 4: Permute the last layer (PLL)
-        if (!solvePLL(instance)) {
-            return false;
-        }
-
-        // if all steps succeed, set the sequence and return true
-        this.sequence = instance.sequence;
-        return true;
-    }
-
-    /**
-     * solves the cross on the cube
-     * returns true if successful, false if it fails to make progress
-     */
-
-    public boolean solveCross(Cube instance) {
-        // Placeholder for the logic to solve the cross.
-        // Implement actual cross-solving logic here.
-
-        // Solve each edge of the cross
-        String totalSeq = "";
-        int crosses = 0;
-        while(true){
-
-            crosses = crossEdged(instance);
-            if (crosses >= 4) break;
-
-            // get solve to another part of the cross
-            String seq = solveToCross(instance, crosses+1); // add method of breadth searcth to find solve
-
-            // do solve
-            Cube.scramble(instance, seq); // crosses should automatically update after
-
-            totalSeq += seq + " ";
-        }
-
-        // orientate appropriately to centers
-        int times = 0;
-        while(true){
-            
-            String seq = "";
-
-            // if centers are orientated
-            if (crossCompleted(instance)){
-                switch(times){
-                    case 1: seq += "W"; break;
-                    case 2: seq += "W2"; break;
-                    case 3: seq += "W'"; break;
-                }
-                totalSeq += seq + " ";
-                break;
-            }
-
-            times++;
-            Cube.turn(instance, Color.WHITE, true);
-        }
-
-        System.out.println(totalSeq);
-
-        return true;
-    }
-
-    // solve a certain amount of white piece edges
-    private String solveToCross(Cube instance, int cross){
-
-        if (crossEdged(instance) == cross) return null;
-
-        // SOLVING SETUP
-        instance.sequence = "";
-        instance.prev = null; // IMPORTANT
-
-        // QUEUES THAT REPRESENT POSSIBLE PERMUTAITON OF GPRIME AND SOLVED IN n MOVES
-        LinkedList<Cube> q = new LinkedList<>();
-        q.addLast(instance);
-
-        // SETUP VAIRABLES
-        int qItr = 0; // n for GPRIME
-
-        Cube copy = null;
-
-        // BREADTH-FIRST SEARCH ACROSS PERMUTATIONS
-        while (!q.isEmpty() && q.size() < maxInstances && qItr < 5){
-
-            // controls n permutations
-            // clear out the queue of n permutations...
-            while (!q.isEmpty() && q.size() < maxInstances && q.peek().sequence.split(" ").length <= qItr){
-                // get first in line to be iterated
-                copy = q.poll();
-
-                // this method might be optimized later to find shorter solution where cfop edges can be solved during another one's
-
-                // check for cross edges
-                if (crossEdged(copy) == cross) return copy.sequence;
-
-                // add instances from this copy
-                addinstances(copy, q, false, false);
-            }
-            qItr++;
-
-        }
-
-        // according to my theory on solving the cross, this should NEVER return null...
-        System.out.println("Something went wrong.  Returned null.");
-        return null;
-    }
-
-    // returns the number of edges that are in the correct order for the cross, regardless of oritentation away from their center colors
-    private int crossEdged(Cube instance){
-        // num is between 1-4
-        // checks if that many white cross edges have been solved
-
-        // get alpha & beta
-        // white-cross in order from yellow on top
-        Color[] correctOrder = {Color.RED, Color.GREEN, Color.ORANGE, Color.BLUE};
-        // get the white face
-        Color[] order = {Cube.getAlpha(instance, Piece.R1W3), Cube.getBeta(instance, Piece.G1W1), Cube.getAlpha(instance, Piece.O1W5), Cube.getBeta(instance, Piece.B1W7)};
-        Color[] gamma = {Cube.getGamma(instance, Piece.R1W3), Cube.getGamma(instance, Piece.G1W1), Cube.getGamma(instance, Piece.O1W5), Cube.getGamma(instance, Piece.B1W7)};
-
-        // check for similarities
-        int crosses = 0;
-        int maxCrosses = 0;
-
-        // use a cycling method to find the max matches
-        for (int i = 0; i < 4; i++){
-
-            crosses = 0;
-            // check gamma if white
-            if (gamma[0] == Color.WHITE && order[0] == correctOrder[i%4]) crosses++;
-            if (gamma[1] == Color.WHITE && order[1] == correctOrder[(i+1)%4]) crosses++;
-            if (gamma[2] == Color.WHITE && order[2] == correctOrder[(i+2)%4]) crosses++;
-            if (gamma[3] == Color.WHITE && order[3] == correctOrder[(i+3)%4]) crosses++;
-
-            if (maxCrosses < crosses) maxCrosses = crosses;
-        }
-
-        return maxCrosses;
-    }
-
-    private boolean crossCompleted(Cube instance){
-
-        // check each edge piece
-        if (Cube.getGamma(instance, Piece.R1W3) != Color.WHITE || Cube.getAlpha(instance, Piece.R1W3) != Color.RED) return false;
-        if (Cube.getGamma(instance, Piece.G1W1) != Color.WHITE || Cube.getBeta(instance, Piece.G1W1) != Color.GREEN) return false;
-        if (Cube.getGamma(instance, Piece.O1W5) != Color.WHITE || Cube.getAlpha(instance, Piece.O1W5) != Color.ORANGE) return false;
-        if (Cube.getGamma(instance, Piece.B1W7) != Color.WHITE || Cube.getBeta(instance, Piece.B1W7) != Color.BLUE) return false;
-
-        return true;
-    }
-
-    /**
-     * solves the first two layers (F2L) on the cube
-     * returns true if successful, false if it fails to make progress
-     */
-    private boolean solveF2L(Cube instance) {
-        // Placeholder for the logic to solve F2L.
-        // Implement actual F2L-solving logic here.
-
-        // preconditions: cross has to be done
-        if (!crossCompleted(instance)) return false;
-
-
-
-
-        return false;
-    }
-
-    /**
-     * solves the orientation of the last layer (OLL) on the cube
-     * returns true if successful, false if it fails to make progress
-     */
-
-    private boolean solveOLL(Cube instance) {
-        // Placeholder for the logic to solve OLL.
-        // Implement actual OLL-solving logic here.
-        return false;
-    }
-
-    /**
-     * solves the permutation of the last layer (PLL) on the cube
-     * returns true if successful, false if it fails to make progress
-     */
-
-    private boolean solvePLL(Cube instance) {
-        // Placeholder for the logic to solve PLL.
-        // Implement actual PLL-solving logic here.
-        return false;
     }
 
     // returns the common object between the arrays.. null if not found
@@ -370,7 +166,7 @@ public class CubeAlgorithm {
                 // get first in line to be iterated
                 copy = q.poll();
                 // add instances from this copy
-                addinstances(copy, q, true, false);
+                addinstances(copy, q, true, false, null);
             }
             qItr++;
 
@@ -386,7 +182,7 @@ public class CubeAlgorithm {
                 // get first sq
                 copy = sq.poll();
                 // add new instances of solved cube queue
-                addinstances(copy, sq, true, false);
+                addinstances(copy, sq, true, false, null);
             }
             sqItr++;
 
@@ -420,20 +216,23 @@ public class CubeAlgorithm {
         Cube clone = null;
         while (!q.isEmpty() && q.peek().sequence.split(" ").length < maxItrs && q.size() < maxInstances){
             copy = q.poll();
-            if (addinstances(copy, q, false, true)) return true;
+            if (addinstances(copy, q, false, true, null)) return true;
         }
         
         scramble = clone;
         return false;
     }
 
-    private boolean addinstances(Cube copy, Queue<Cube> q, boolean g_prime, boolean check_g_prime){
+    // turns the cube to find solutions
+    protected boolean addinstances(Cube copy, Queue<Cube> q, boolean g_prime, boolean check_g_prime, Color dontTurn){
+
 
         Cube clone = null;
 
         // for each face
         for (Color face : Color.values()){
             // optimizations
+            if (dontTurn != null && face == dontTurn) continue;
             if (face == copy.prev) continue; 
             if (Color.opp(face) == copy.prev && Color.isDom(copy.prev)) continue;
             
