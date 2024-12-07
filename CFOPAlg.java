@@ -199,10 +199,11 @@ public class CFOPAlg extends CubeAlgorithm {
     }
 
     // checks the yellow face for any existing pairs
-    private Color[] pairOnTop(Cube instance, int pairs){
+    private Piece[] pairOnTop(Cube instance, int pairs){
 
         // check if cross has been maintained
         if (!crossCompleted(instance)) return null;
+        if (pairs(instance) != pairs) return null; // make sure current structure was maintained
 
         // first check for white colors on yellow corners
         Piece[] corners = {Piece.R8B6Y0, Piece.O6B8Y2, Piece.O8G6Y8, Piece.R6G8Y6};
@@ -219,9 +220,10 @@ public class CFOPAlg extends CubeAlgorithm {
                     if (Arrays.equals(type, getPairType(instance, e))){
                         // found one!!
 
-                        // we should identify the orientation too
+                        // return locations
+                        Piece[] pieceLocs = {c, e};
 
-                        return type; // we should return the pair type
+                        return pieceLocs; // we should return the pair type
                     }
                 }
 
@@ -299,14 +301,15 @@ public class CFOPAlg extends CubeAlgorithm {
                 // can be optimized but idk where to start
 
                 // check if pair on top w/o curr structure being broken
-                Color[] type = pairOnTop(copy, pairs);
+                Piece[] type = pairOnTop(copy, pairs);
                 if (type != null){
 
                     // identify orientation
 
                     // get orientation sequence
 
-                    return copy.sequence;
+                    // return that sequence with current sequence
+                    return copy.sequence; // + orientation sequence
                 }
 
                 // add instances from this copy
