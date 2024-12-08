@@ -2,6 +2,400 @@ import java.util.*;
 
 public class CFOPAlg extends CubeAlgorithm {
 
+    // list of F2L unorientated pairs on the yellow side
+    /**
+     * U11
+     * 
+     *   ^edge primary/secondary color on top
+     * 
+     *  ^edge location
+     * 
+     * ^
+     * white face
+     * 
+     * primary color = alpha color if both colors are both dominant or recessive, beta color if one is dom and other recessive
+     * secondary color = beta color if both colors are both dom or both recessive, alpha color if one is dom and other recessive
+     * 
+     * 
+     */
+    private enum Pair{
+        U11,
+        U12,
+        U21,
+        U22,
+        U31,
+        U32,
+        U41,
+        U42,
+        B11,
+        B12,
+        B21,
+        B22,
+        B31,
+        B32,
+        B41,
+        B42,
+        L11,
+        L12,
+        L21,
+        L22,
+        L31,
+        L32,
+        L41,
+        L42;
+
+        public enum ColorType{
+            PRIMARY,
+            SECONDARY,
+            NULL;
+
+            public static ColorType getType(Cube instance, Piece p, Color c){
+
+                if (c == Color.WHITE || c == Color.YELLOW) return ColorType.NULL;
+
+                Color[] type = getPairType(instance, p);
+                if (type == null) return null;
+
+                boolean alphaIsPrimary = Color.isDom(type[0]) == Color.isDom(type[1]);
+
+                if (alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.PRIMARY;
+                if (!alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.SECONDARY;
+                if (!alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.PRIMARY;
+                if (alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.PRIMARY;
+
+                return null;
+            }
+
+            public static Color getPrimaryColor(Cube instance, Piece p){
+
+                Color[] type = getPairType(instance, p);
+                if (type == null) return null;
+
+                boolean alphaIsPrimary = Color.isDom(type[0]) == Color.isDom(type[1]);
+
+                if (alphaIsPrimary) return type[0];
+                else return type[1];
+            }
+        }
+
+        // return the color to the left when yellow is on top
+        private static Color getLeftColor(Color c){
+            switch(c){
+                case Color.RED: return Color.BLUE;
+                case Color.GREEN: return Color.RED;
+                case Color.ORANGE: return Color.GREEN;
+                case Color.BLUE: return Color.ORANGE;
+                default: return null;
+            }
+        }
+
+        // return the color to the right when yellow is on top
+        private static Color getRightColor(Color c){
+            switch(c){
+                case Color.RED: return Color.GREEN;
+                case Color.GREEN: return Color.ORANGE;
+                case Color.ORANGE: return Color.BLUE;
+                case Color.BLUE: return Color.RED;
+                default: return null;
+            }
+        }
+
+        // return the color to the back when yellow is on top
+        private static Color getBackColor(Color c){
+            return Color.opp(c);
+        }
+
+        private static Pair identifyPair(Cube instance, Piece[] pairPieces){
+
+            for (Pair p : Pair.values()){
+                // check if same pieces
+                if (!Arrays.equals(getPieces(p), pairPieces)) continue;
+
+                // check if pieces are orientated the same way
+                Piece[] pp = getPieces(p);
+                ColorType[] cornerOrientation = getPrimaryCornerColors(p);
+                ColorType edgeOrientation = getPrimaryEdgeColor(p);
+
+                // cube orientation
+                ColorType[] cube_cornerOrient = getCornerColorTypes(instance, pairPieces[0]);
+                ColorType cube_edgeOrient = getEdgeColorType(instance, pairPieces[1]);
+
+                if (!Arrays.equals(cornerOrientation, cube_cornerOrient)) continue;
+                if (edgeOrientation != cube_edgeOrient) continue;
+
+                // success!!
+                return p;
+            }
+
+            return null;
+        }
+
+        public static Pair identifyOrientatePair(Cube instance, Piece[] pairPieces){
+
+            Cube copy = new Cube(instance);
+            Pair pairType = null;
+
+            pairType = identifyPair(copy, pairPieces);
+            if (pairType != null) return pairType;
+
+            Cube.turn(copy, "Y");
+            pairType = identifyPair(copy, pairPieces);
+            if (pairType != null) return pairType;
+
+            copy = new Cube(instance);
+            Cube.turn(copy, "Y'");
+            pairType = identifyPair(copy, pairPieces);
+            if (pairType != null) return pairType;
+
+            copy = new Cube(instance);
+            Cube.turn(copy, "Y2");
+            pairType = identifyPair(copy, pairPieces);
+            if (pairType != null) return pairType;
+
+            return null;
+        }
+
+        /**
+         * returns sequence that is the @param String seq 
+         * converted into a cube sequence
+         * 
+         * yellow is assumed to be on top
+         *  */ 
+        public static String convertSeq(String seq, Color frontFace){
+
+            // frontFace must be a face color that's not white or yellow
+            if (frontFace == Color.YELLOW || frontFace == Color.WHITE || frontFace == null) return null; 
+
+            String left = getLeftColor(frontFace).toString();
+            String right = getRightColor(frontFace).toString();
+            String back = getBackColor(frontFace).toString();
+
+            String result = "";
+
+            for (int i = 0; i < seq.length(); i++){
+
+                String c = seq.substring(i, i+1);
+                
+                if (c.equals("R")){
+                    c = right;
+                } else if (c.equals("B")){
+                    c = back;
+                } else if (c.equals("L")){
+                    c = left;
+                } else if (c.equals("F")){
+                    c = frontFace.toString();
+                }
+
+                result += c;
+            }
+
+            return result;
+        }
+
+        // returns all sequences that solve pair
+        public static String[] getSequences(Pair pair){
+
+            switch(pair){
+                case U11: return new String[]{"L' U2 L U L' U' L"};
+                case U12: return new String[]{"B L' B' L F U F'","L F' L' F U F U F'",};
+                case U21: return new String[]{"L' U2 L U' L' U L"};
+                case U22: return new String[]{"F R U2 R' F'"};
+                case U31: return new String[]{"L' B' U2 B L"};
+                case U32: return new String[]{"F U2 F2 L F L'"};
+                case U41: return new String[]{"R F' R' F L' U L"};
+                case U42: return new String[]{"F U2 F' U' F U F'"};
+                case B11: return new String[]{"L' U L U' L' U' L"};
+                case B12: return new String[]{"F' U F U' F U F'","L' U L U2 F U F'"};
+                case B21: return new String[]{"L' U' L"};
+                case B22: return new String[]{"F U2 F' U2 F U' F'"};
+                case B31: return new String[]{"L U' L2 U' L","L' U' L U' L' U' L"};
+                case B32: return new String[]{"F U F' U2 F U' F'"};
+                case B41: return new String[]{"L U2 L2 U' L","F U2 F' U L' U' L"};
+                case B42: return new String[]{"F U' F'"};
+                case L11: return new String[]{"L' U L"};
+                case L12: return new String[]{"F' U2 F2 U F'","L' U2 L U' F U F'"};
+                case L21: return new String[]{"L' U' L U2 L' U L"};
+                case L22: return new String[]{"F' U F2 U F'","F U F' U F U F'","F U F' U' F U F'"};
+                case L31: return new String[]{"L' U2 L U2 L' U L"};
+                case L32: return new String[]{"F U F'"};
+                case L41: return new String[]{"L U' L' U L' U' L","F U' F' U2 L' U' L"};
+                case L42: return new String[]{"F U' F U F U F'"};
+            }
+
+            return null;
+        }
+
+        // returns the pieces relative to a red-green pair
+        public static Piece[] getPieces(Pair pair){
+
+            switch(pair){
+                case U11: 
+                case U12:
+                case B11: 
+                case B12: 
+                case L11: 
+                case L12: return new Piece[]{Piece.R8B6Y0, Piece.B7Y1};
+                case U21: 
+                case U22:
+                case B21: 
+                case B22: 
+                case L21:
+                case L22: return new Piece[]{Piece.R8B6Y0, Piece.O7Y5};
+                case U31:
+                case U32:
+                case B31: 
+                case B32: 
+                case L31: 
+                case L32: return new Piece[]{Piece.R8B6Y0, Piece.G7Y7};
+                case U41: 
+                case U42:
+                case B41: 
+                case B42:
+                case L41: 
+                case L42: return new Piece[]{Piece.R8B6Y0, Piece.R7Y3};
+            }
+
+            return null;
+        }
+
+        private static ColorType[] getCornerColorTypes(Cube instance, Piece corner){
+
+            // keeping it relative to one pair
+            if (corner != Piece.R8B6Y0) return null;
+
+            Color left = Cube.getAlpha(instance, corner);
+            Color back = Cube.getBeta(instance, corner);
+            Color top = Cube.getGamma(instance, corner);
+
+            ColorType[] colorTypes = {ColorType.getType(instance, corner, left), ColorType.getType(instance, corner, back), ColorType.getType(instance, corner, top)};
+
+            return colorTypes;
+        }
+
+        private static ColorType getEdgeColorType(Cube instance, Piece edge){
+            // if not a pair edge on top... return null;
+            if (edge != Piece.R7Y3 && edge != Piece.B7Y1 && edge != Piece.O7Y5 && edge != Piece.G7Y7) return null;
+
+            Color topColor = Cube.getGamma(instance, edge);
+
+            return ColorType.getType(instance, edge, topColor);
+        }
+
+        // returns the order of primary and secondary colors of the corner of the pair in order of L(left) B(back) U(up)
+        // 1 = primary color is here
+        // 2 = secondary color is here
+        // 0 = white is here
+        private static ColorType[] getPrimaryCornerColors(Pair pair){
+
+            switch(pair){
+                case U11: 
+                case U12: 
+                case U21: 
+                case U22:
+                case U31:
+                case U32:
+                case U41: 
+                case U42: return new ColorType[]{ColorType.SECONDARY, ColorType.PRIMARY, ColorType.NULL};
+                case B11: 
+                case B12: 
+                case B21: 
+                case B22: 
+                case B31: 
+                case B32: 
+                case B41: 
+                case B42: return new ColorType[]{ColorType.PRIMARY, ColorType.NULL, ColorType.SECONDARY};
+                case L11: 
+                case L12: 
+                case L21:
+                case L22: 
+                case L31: 
+                case L32: 
+                case L41: 
+                case L42: return new ColorType[]{ColorType.NULL, ColorType.SECONDARY, ColorType.PRIMARY};
+            }
+
+            return null;
+        }
+
+        // returns TRUE if the primary color is on top of this edge piece for this pair type, false otherwise
+        private static ColorType getPrimaryEdgeColor(Pair pair){
+
+            switch(pair){
+                case U12:
+                case U22:
+                case U32:
+                case U42: 
+                case B12: 
+                case B22: 
+                case B32: 
+                case B42: 
+                case L12: 
+                case L22: 
+                case L32: 
+                case L42: return ColorType.SECONDARY;
+                case U11: 
+                case U21: 
+                case U31:
+                case U41: 
+                case B11: 
+                case B21: 
+                case B31: 
+                case B41: 
+                case L11: 
+                case L21:
+                case L31: 
+                case L41: return ColorType.PRIMARY;
+            }
+
+            return ColorType.NULL;
+        }
+
+        public static String getPairSeq(Cube instance, Pair type, int pairs, Color primaryColor){
+
+            // store pair sequence (there may be more than one, aka L22 is the only special case)
+            String[] orderSequences = getSequences(type);
+            // convert the sequences
+            String[] sequences = new String[orderSequences.length];
+            for (int i = 0; i < orderSequences.length; i++){
+                sequences[i] = convertSeq(orderSequences[i], primaryColor);
+            }
+            Cube copy = null;
+
+            // for first move try each sequence
+            for (int i = 0; i < sequences.length; i++){
+                copy = new Cube(instance);
+
+                Cube.turn(copy, sequences[i]);
+                if (pairs(copy) == pairs){
+                    return sequences[i];
+                }
+            }
+
+            // for the rest of moves try each sequence
+            // orientate for 4 times....
+                
+            String[] moveSet = {"Y, Y', Y2"};
+            for (String move : moveSet){
+                // do pair sequence
+                for (int i = 0; i < sequences.length; i++){
+                    // orientate
+                    copy = new Cube(instance);
+                    Cube.turn(copy, move);
+    
+                    // try solving sequence
+                    Cube.turn(copy, sequences[i]);
+                    // if we meet the pairs goal aka did it solve?
+                    if (pairs(copy) == pairs){
+                        // return sequence done
+                        return move + " " + sequences[i];
+                    }
+                }
+            }                
+
+            return null;
+        }
+    }
+
     public CFOPAlg(Cube other){
         super(other);
     }
@@ -160,7 +554,7 @@ public class CFOPAlg extends CubeAlgorithm {
         return maxCrosses;
     }
 
-    private boolean crossCompleted(Cube instance){
+    private static boolean crossCompleted(Cube instance){
 
         // check each edge piece
         if (Cube.getGamma(instance, Piece.R1W3) != Color.WHITE || Cube.getAlpha(instance, Piece.R1W3) != Color.RED) return false;
@@ -182,7 +576,7 @@ public class CFOPAlg extends CubeAlgorithm {
         return false;
     }
 
-    private Color[] getPairType(Cube instance, Piece p){
+    public static Color[] getPairType(Cube instance, Piece p){
 
         Color[] type = new Color[2];
 
@@ -233,7 +627,8 @@ public class CFOPAlg extends CubeAlgorithm {
         return null;
     }
 
-    private int pairs(Cube instance){
+    // returns the number of completed pairs in the cube
+    private static int pairs(Cube instance){
 
         // precondition of cross being completed
         if (!crossCompleted(instance)) return 0;
@@ -305,11 +700,13 @@ public class CFOPAlg extends CubeAlgorithm {
                 if (type != null){
 
                     // identify orientation
+                    Pair pairType = Pair.identifyOrientatePair(instance, type);
 
                     // get orientation sequence
+                    Color primaryColor = Pair.ColorType.getPrimaryColor(instance, type[0]);
+                    String pairSequence = Pair.getPairSeq(instance, pairType, pairs, primaryColor); // built-in orientation sequence with plug in sequence
 
-                    // return that sequence with current sequence
-                    return copy.sequence; // + orientation sequence
+                    return pairSequence;
                 }
 
                 // add instances from this copy

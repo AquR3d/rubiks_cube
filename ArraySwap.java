@@ -8,6 +8,8 @@
  * the representation of configurations of a cube, like turning.
  */
 
+
+
 public abstract class ArraySwap{
     // swaps these elements in the array
     public static void swap(Object[] array, int idx1, int idx2){
