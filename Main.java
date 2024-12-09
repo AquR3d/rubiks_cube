@@ -80,5 +80,9 @@ public class Main{
 
         System.out.println(cube);
 
+        alg.solveF2L(cube);
+
+        System.out.println(cube);
+
     }
 }

@@ -45,9 +45,9 @@ public class CFOPAlg extends CubeAlgorithm {
         L42;
 
         public enum ColorType{
-            PRIMARY,
-            SECONDARY,
-            NULL;
+            PRIMARY {@Override public String toString() { return "PRIMARY"; }},
+            SECONDARY {@Override public String toString() { return "SECONDARY"; }},
+            NULL {@Override public String toString() { return "NULL"; }};
 
             public static ColorType getType(Cube instance, Piece p, Color c){
 
@@ -61,7 +61,7 @@ public class CFOPAlg extends CubeAlgorithm {
                 if (alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.PRIMARY;
                 if (!alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.SECONDARY;
                 if (!alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.PRIMARY;
-                if (alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.PRIMARY;
+                if (alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.SECONDARY;
 
                 return null;
             }
@@ -108,17 +108,42 @@ public class CFOPAlg extends CubeAlgorithm {
         private static Pair identifyPair(Cube instance, Piece[] pairPieces){
 
             for (Pair p : Pair.values()){
+
+                Piece[] pieces = getPieces(p);
+                
+                /*System.out.println("correct pieces: " + pieces[0].toString() + ":" + pieces[1].toString());
+                System.out.println("current pieces: " + pairPieces[0].toString() + ":" + pairPieces[1].toString());*/
+
                 // check if same pieces
-                if (!Arrays.equals(getPieces(p), pairPieces)) continue;
+                if (!Arrays.equals(pieces, pairPieces)) continue;
 
                 // check if pieces are orientated the same way
-                Piece[] pp = getPieces(p);
                 ColorType[] cornerOrientation = getPrimaryCornerColors(p);
                 ColorType edgeOrientation = getPrimaryEdgeColor(p);
 
                 // cube orientation
                 ColorType[] cube_cornerOrient = getCornerColorTypes(instance, pairPieces[0]);
                 ColorType cube_edgeOrient = getEdgeColorType(instance, pairPieces[1]);
+
+
+                /*DEBUGGING
+                System.out.println("Correct:");
+                for (ColorType cT : cornerOrientation){
+                    System.out.print(cT.toString() + " ");
+                }
+                System.out.println();
+                System.out.println(edgeOrientation.toString());
+
+
+                System.out.println("Current:");
+                for (ColorType cT : cube_cornerOrient){
+                    System.out.print(cT.toString() + " ");
+                }
+                System.out.println();
+                System.out.println(cube_edgeOrient.toString());
+                // END BUGGING */
+
+
 
                 if (!Arrays.equals(cornerOrientation, cube_cornerOrient)) continue;
                 if (edgeOrientation != cube_edgeOrient) continue;
@@ -130,27 +155,35 @@ public class CFOPAlg extends CubeAlgorithm {
             return null;
         }
 
-        public static Pair identifyOrientatePair(Cube instance, Piece[] pairPieces){
+        public static Pair identifyOrientatePair(Cube instance, Color[] colors){
 
             Cube copy = new Cube(instance);
+            Piece[] pairPieces = null;
             Pair pairType = null;
 
+            pairPieces = pairOnTop(copy, colors);
             pairType = identifyPair(copy, pairPieces);
             if (pairType != null) return pairType;
 
+            copy = new Cube(instance);
             Cube.turn(copy, "Y");
+            pairPieces = pairOnTop(copy, colors);
             pairType = identifyPair(copy, pairPieces);
             if (pairType != null) return pairType;
 
             copy = new Cube(instance);
             Cube.turn(copy, "Y'");
+            pairPieces = pairOnTop(copy, colors);
             pairType = identifyPair(copy, pairPieces);
             if (pairType != null) return pairType;
 
             copy = new Cube(instance);
             Cube.turn(copy, "Y2");
+            pairPieces = pairOnTop(copy, colors);
             pairType = identifyPair(copy, pairPieces);
             if (pairType != null) return pairType;
+
+            System.out.println("Something went wrong identifying a pair.  Returned null");
 
             return null;
         }
@@ -184,6 +217,10 @@ public class CFOPAlg extends CubeAlgorithm {
                     c = left;
                 } else if (c.equals("F")){
                     c = frontFace.toString();
+                } else if (c.equals("U")){
+                    c = "Y";
+                } else if (c.equals("D")){
+                    c = "W";
                 }
 
                 result += c;
@@ -202,7 +239,7 @@ public class CFOPAlg extends CubeAlgorithm {
                 case U22: return new String[]{"F R U2 R' F'"};
                 case U31: return new String[]{"L' B' U2 B L"};
                 case U32: return new String[]{"F U2 F2 L F L'"};
-                case U41: return new String[]{"R F' R' F L' U L"};
+                case U41: return new String[]{"L U F U' F' L' F U' F'"};
                 case U42: return new String[]{"F U2 F' U' F U F'"};
                 case B11: return new String[]{"L' U L U' L' U' L"};
                 case B12: return new String[]{"F' U F U' F U F'","L' U L U2 F U F'"};
@@ -219,7 +256,7 @@ public class CFOPAlg extends CubeAlgorithm {
                 case L31: return new String[]{"L' U2 L U2 L' U L"};
                 case L32: return new String[]{"F U F'"};
                 case L41: return new String[]{"L U' L' U L' U' L","F U' F' U2 L' U' L"};
-                case L42: return new String[]{"F U' F U F U F'"};
+                case L42: return new String[]{"F U' F' U F U F'"}; // fixed
             }
 
             return null;
@@ -365,7 +402,13 @@ public class CFOPAlg extends CubeAlgorithm {
             for (int i = 0; i < sequences.length; i++){
                 copy = new Cube(instance);
 
-                Cube.turn(copy, sequences[i]);
+                Cube.scramble(copy, sequences[i]);
+
+                // prints
+                System.out.println(sequences[i]);
+                System.out.println(copy);
+
+                System.out.println(pairs(copy));
                 if (pairs(copy) == pairs){
                     return sequences[i];
                 }
@@ -374,7 +417,7 @@ public class CFOPAlg extends CubeAlgorithm {
             // for the rest of moves try each sequence
             // orientate for 4 times....
                 
-            String[] moveSet = {"Y, Y', Y2"};
+            String[] moveSet = {"Y", "Y'", "Y2"};
             for (String move : moveSet){
                 // do pair sequence
                 for (int i = 0; i < sequences.length; i++){
@@ -383,8 +426,15 @@ public class CFOPAlg extends CubeAlgorithm {
                     Cube.turn(copy, move);
     
                     // try solving sequence
-                    Cube.turn(copy, sequences[i]);
+                    Cube.scramble(copy, sequences[i]);
+
+                    // prints
+                    System.out.println(move + " " + sequences[i]);
+                    System.out.println("pairs: " + pairs(copy));
+                    System.out.println(copy);
+
                     // if we meet the pairs goal aka did it solve?
+                    
                     if (pairs(copy) == pairs){
                         // return sequence done
                         return move + " " + sequences[i];
@@ -566,7 +616,7 @@ public class CFOPAlg extends CubeAlgorithm {
     }
 
     // I might consider putting this in the Cube class instead.
-    private boolean hasColor(Cube instance, Piece p, Color color){
+    private static boolean hasColor(Cube instance, Piece p, Color color){
 
         // if any of the faces are colored "color", return true.. false if none of the faces are colored "color"
         if (Cube.getAlpha(instance, p) == color) return true;
@@ -593,11 +643,16 @@ public class CFOPAlg extends CubeAlgorithm {
     }
 
     // checks the yellow face for any existing pairs
-    private Piece[] pairOnTop(Cube instance, int pairs){
+    private static Piece[] pairOnTop(Cube instance, int pairs){
 
         // check if cross has been maintained
-        if (!crossCompleted(instance)) return null;
-        if (pairs(instance) != pairs) return null; // make sure current structure was maintained
+        if (!crossCompleted(instance)) {
+            return null;
+        }
+        if (pairs(instance) != pairs) {
+            return null; // make sure current structure was maintained
+        }
+
 
         // first check for white colors on yellow corners
         Piece[] corners = {Piece.R8B6Y0, Piece.O6B8Y2, Piece.O8G6Y8, Piece.R6G8Y6};
@@ -606,6 +661,7 @@ public class CFOPAlg extends CubeAlgorithm {
         for (Piece c : corners){
 
             if (hasColor(instance, c, Color.WHITE)){
+
                 // identify pair-colors
                 Color[] type = getPairType(instance, c);
 
@@ -613,6 +669,47 @@ public class CFOPAlg extends CubeAlgorithm {
                 for (Piece e : edges){
                     if (Arrays.equals(type, getPairType(instance, e))){
                         // found one!!
+                        System.out.println("pair found of type: " + type[0].toString() + ":" + type[1].toString());
+
+                        // return locations
+                        Piece[] pieceLocs = {c, e};
+
+                        return pieceLocs; // we should return the pair type
+                    }
+                }
+
+            }
+        }
+
+        return null;
+    }
+
+    // checks for a pair of colors
+    private static Piece[] pairOnTop(Cube instance, Color[] colors){
+
+        // check if cross has been maintained
+        if (!crossCompleted(instance)) {
+            return null;
+        }
+
+        // first check for white colors on yellow corners
+        Piece[] corners = {Piece.R8B6Y0, Piece.O6B8Y2, Piece.O8G6Y8, Piece.R6G8Y6};
+        Piece[] edges = {Piece.R7Y3, Piece.B7Y1, Piece.O7Y5, Piece.G7Y7};
+
+        for (Piece c : corners){
+
+            if (hasColor(instance, c, Color.WHITE)){
+
+                // identify pair-colors
+                Color[] type = getPairType(instance, c);
+
+                if (!Arrays.equals(type, colors)) continue;
+
+                // check if any edges match type
+                for (Piece e : edges){
+                    if (Arrays.equals(type, getPairType(instance, e))){
+                        // found one!!
+                        System.out.println("pair found of type: " + type[0].toString() + ":" + type[1].toString());
 
                         // return locations
                         Piece[] pieceLocs = {c, e};
@@ -633,14 +730,32 @@ public class CFOPAlg extends CubeAlgorithm {
         // precondition of cross being completed
         if (!crossCompleted(instance)) return 0;
 
-        return 0;
+        // identify how many pairs are in place!!
+        int numPairs = 0;
+        Piece[][] pairs = {{Piece.R2B0W6, Piece.R5B3}, {Piece.O0B2W8, Piece.O3B5}, {Piece.O2G0W2, Piece.O5G3}, {Piece.R0G2W0, Piece.R3G5}};
+
+        for(Piece[] pair : pairs){
+
+            // check corner is in place
+            if (Cube.getAlpha(instance, pair[0]) != Piece.getAlpha(pair[0])) continue;
+            if (Cube.getBeta(instance, pair[0]) != Piece.getBeta(pair[0])) continue;
+            if (Cube.getGamma(instance, pair[0]) != Piece.getGamma(pair[0])) continue;
+
+            // check edge is in place
+            if (Cube.getAlpha(instance, pair[1]) != Piece.getAlpha(pair[1])) continue;
+            if (Cube.getBeta(instance, pair[1]) != Piece.getBeta(pair[1])) continue;
+
+            numPairs++;
+        }
+
+        return numPairs;
     }
 
     /**
      * solves the first two layers (F2L) on the cube
      * returns true if successful, false if it fails to make progress
      */
-    private boolean solveF2L(Cube instance) {
+    public boolean solveF2L(Cube instance) {
         // Placeholder for the logic to solve F2L.
         // Implement actual F2L-solving logic here.
 
@@ -651,13 +766,19 @@ public class CFOPAlg extends CubeAlgorithm {
         while(true){
 
             pairs = pairs(instance);
+            System.out.println("pairs returned " + pairs);
             if (pairs >= 4) break;
 
             // get solve to another part of pairs
             String seq = solveToF2L(instance, pairs+1); // add method of breadth searcth to find solve
 
+            System.out.println("seq received: \'" + seq + "\'");
+            System.out.println(instance);
+
             // do solve
-            Cube.scramble(instance, seq); // pairs should automatically update after
+            boolean worked = Cube.scramble(instance, seq); // pairs should automatically update after
+
+            System.out.println(worked + "\n" + instance);
 
             totalSeq += seq + " ";
         }
@@ -696,17 +817,25 @@ public class CFOPAlg extends CubeAlgorithm {
                 // can be optimized but idk where to start
 
                 // check if pair on top w/o curr structure being broken
-                Piece[] type = pairOnTop(copy, pairs);
+                Piece[] type = pairOnTop(copy, pairs-1); // THIS FAILS PLEASE TEST
                 if (type != null){
 
+                    System.out.println("pair on top!");
+                    System.out.println(copy.sequence);
+                    System.out.println(copy);
+
+                    Color[] colors = getPairType(copy, type[0]);
                     // identify orientation
-                    Pair pairType = Pair.identifyOrientatePair(instance, type);
+                    Pair pairType = Pair.identifyOrientatePair(copy, colors);
 
                     // get orientation sequence
-                    Color primaryColor = Pair.ColorType.getPrimaryColor(instance, type[0]);
-                    String pairSequence = Pair.getPairSeq(instance, pairType, pairs, primaryColor); // built-in orientation sequence with plug in sequence
+                    Color primaryColor = Pair.ColorType.getPrimaryColor(copy, type[0]);
+                    String pairSequence = Pair.getPairSeq(copy, pairType, pairs, primaryColor); // built-in orientation sequence with plug in sequence
 
-                    return pairSequence;
+                    System.out.println("final pair seq: " + pairSequence);
+
+                    if (copy.sequence.length() < 1) return pairSequence;
+                    return copy.sequence + " " + pairSequence;
                 }
 
                 // add instances from this copy
