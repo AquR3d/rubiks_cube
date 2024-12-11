@@ -405,10 +405,10 @@ public class CFOPAlg extends CubeAlgorithm {
                 Cube.scramble(copy, sequences[i]);
 
                 // prints
-                System.out.println(sequences[i]);
-                System.out.println(copy);
+                //System.out.println(sequences[i]);
+                //System.out.println(copy);
 
-                System.out.println(pairs(copy));
+                //System.out.println(pairs(copy));
                 if (pairs(copy) == pairs){
                     return sequences[i];
                 }
@@ -429,9 +429,9 @@ public class CFOPAlg extends CubeAlgorithm {
                     Cube.scramble(copy, sequences[i]);
 
                     // prints
-                    System.out.println(move + " " + sequences[i]);
-                    System.out.println("pairs: " + pairs(copy));
-                    System.out.println(copy);
+                    //System.out.println(move + " " + sequences[i]);
+                    //System.out.println("pairs: " + pairs(copy));
+                    //System.out.println(copy);
 
                     // if we meet the pairs goal aka did it solve?
                     
@@ -441,6 +441,186 @@ public class CFOPAlg extends CubeAlgorithm {
                     }
                 }
             }                
+
+            return null;
+        }
+    }
+
+    // a list of all the olls 1-57 with their respective algorithm solve
+    private enum OLL{
+        D1, // DOT
+        D2,
+        D3,
+        D4,
+        S1, // SQUARE
+        S2,
+        L1, // LIGHTNING-BOLT
+        L2,
+        F1, // FISH
+        F2,
+        L3, // LIGHTNING-BOLT
+        L4,
+        K1, // KNIGHT-MOVE
+        K2,
+        K3,
+        K4,
+        D5, // DOT
+        D6,
+        D7,
+        D8,
+        EO1, // EDGES-ORIENTED
+        EO2,
+        EO3,
+        EO4,
+        EO5,
+        EO6,
+        EO7,
+        CO1, // CORNERS-ORIENTED
+        A1, // AWKWARD-SHAPED
+        A2,
+        P1, // P-SHAPED
+        P2,
+        T1, // T-SHAPED
+        C1, // C-SHAPED
+        F3, // FISH
+        W1, // W-SHAPED
+        F4, // FISH
+        W2, // W-SHAPED
+        L5, // LIGHTNING-BOLT
+        L6,
+        A3, // AWKWARD-SHAPED
+        A4,
+        P3, // P-SHAPED
+        P4,
+        T2, // T-SHAPED
+        C2, // C-SHAPED
+        SL1, // SMALL-L-SHAPED
+        SL2,
+        SL3,
+        SL4,
+        I1, // I-SHAPED
+        I2,
+        SL5, // SMALL-L-SHAPED
+        SL6,
+        I3, // I-SHAPED
+        I4,
+        CO2; // CORNERS-ORIENTED
+
+        public String getAlgorithm(OLL type){
+
+            switch(type){
+                case D1: return "";
+                case D2: return "";
+                case D3: return "";
+                case D4: return "";
+                case S1: return "";
+                case S2: return "";
+                case L1: return "";
+                case L2: return "";
+                case F1: return "";
+                case F2: return "";
+                case L3: return "";
+                case L4: return "";
+                case K1: return "";
+                case K2: return "";
+                case K3: return "";
+                case K4: return "";
+                case D5: return "";
+                case D6: return "";
+                case D7: return "";
+                case D8: return "";
+                case EO1: return "";
+                case EO2: return "";
+                case EO3: return "";
+                case EO4: return "";
+                case EO5: return "";
+                case EO6: return "";
+                case EO7: return "";
+                case CO1: return "";
+                case A1: return "";
+                case A2: return "";
+                case P1: return "";
+                case P2: return "";
+                case T1: return "";
+                case C1: return "";
+                case F3: return "";
+                case W1: return "";
+                case F4: return "";
+                case W2: return "";
+                case L5: return "";
+                case L6: return "";
+                case A3: return "";
+                case A4: return "";
+                case P3: return "";
+                case P4: return "";
+                case T2: return "";
+                case C2: return "";
+                case SL1: return "";
+                case SL2: return "";
+                case SL3: return "";
+                case SL4: return "";
+                case I1: return "";
+                case I2: return "";
+                case SL5: return "";
+                case SL6: return "";
+                case I3: return "";
+                case I4: return "";
+                case CO2: return "";
+            }
+
+            return null;
+        }
+    }
+
+    // a list of all the plls 1-21 with their respective algorithm solve
+    private enum PLL{
+        Aa,
+        Ab,
+        E,
+        F,
+        Ga,
+        Gb,
+        Gc,
+        Gd,
+        H,
+        Ja,
+        Jb,
+        Na,
+        Nb,
+        Ra,
+        Rb,
+        T,
+        Ua,
+        Ub,
+        V,
+        Y,
+        Z;
+
+        public String getAlgorithm(PLL type){
+
+            switch(type){
+                case Aa: return "";
+                case Ab: return "";
+                case E: return "";
+                case F: return "";
+                case Ga: return "";
+                case Gb: return "";
+                case Gc: return "";
+                case Gd: return "";
+                case H: return "";
+                case Ja: return "";
+                case Jb: return "";
+                case Na: return "";
+                case Nb: return "";
+                case Ra: return "";
+                case Rb: return "";
+                case T: return "";
+                case Ua: return "";
+                case Ub: return "";
+                case V: return "";
+                case Y: return "";
+                case Z: return "";
+            }
 
             return null;
         }
@@ -669,7 +849,7 @@ public class CFOPAlg extends CubeAlgorithm {
                 for (Piece e : edges){
                     if (Arrays.equals(type, getPairType(instance, e))){
                         // found one!!
-                        System.out.println("pair found of type: " + type[0].toString() + ":" + type[1].toString());
+                        //System.out.println("pair found of type: " + type[0].toString() + ":" + type[1].toString());
 
                         // return locations
                         Piece[] pieceLocs = {c, e};
@@ -709,7 +889,7 @@ public class CFOPAlg extends CubeAlgorithm {
                 for (Piece e : edges){
                     if (Arrays.equals(type, getPairType(instance, e))){
                         // found one!!
-                        System.out.println("pair found of type: " + type[0].toString() + ":" + type[1].toString());
+                        //System.out.println("pair found of type: " + type[0].toString() + ":" + type[1].toString());
 
                         // return locations
                         Piece[] pieceLocs = {c, e};
@@ -766,24 +946,42 @@ public class CFOPAlg extends CubeAlgorithm {
         while(true){
 
             pairs = pairs(instance);
-            System.out.println("pairs returned " + pairs);
+            //System.out.println("pairs returned " + pairs);
             if (pairs >= 4) break;
 
             // get solve to another part of pairs
             String seq = solveToF2L(instance, pairs+1); // add method of breadth searcth to find solve
 
-            System.out.println("seq received: \'" + seq + "\'");
-            System.out.println(instance);
+            //System.out.println("seq received: \'" + seq + "\'");
+            //System.out.println(instance);
 
             // do solve
             boolean worked = Cube.scramble(instance, seq); // pairs should automatically update after
 
-            System.out.println(worked + "\n" + instance);
+            //System.out.println(worked + "\n" + instance);
 
             totalSeq += seq + " ";
         }
 
-        System.out.println(totalSeq);
+        int i = 0;
+        int spaces = 0;
+        while(i < totalSeq.length()){
+            if (totalSeq.substring(i, i+1).equals(" ")){
+                spaces++;
+
+                if (spaces % 7 == 0){
+                    System.out.println();
+                } else {
+                    System.out.print(" ");
+                }
+            } else {
+                System.out.print(totalSeq.substring(i, i+1));
+            }
+
+            i++;
+        }
+        System.out.println();
+        //System.out.println(totalSeq);
 
         return true;
     }
@@ -820,9 +1018,9 @@ public class CFOPAlg extends CubeAlgorithm {
                 Piece[] type = pairOnTop(copy, pairs-1); // THIS FAILS PLEASE TEST
                 if (type != null){
 
-                    System.out.println("pair on top!");
-                    System.out.println(copy.sequence);
-                    System.out.println(copy);
+                    //System.out.println("pair on top!");
+                    //System.out.println(copy.sequence);
+                    //System.out.println(copy);
 
                     Color[] colors = getPairType(copy, type[0]);
                     // identify orientation
@@ -832,7 +1030,7 @@ public class CFOPAlg extends CubeAlgorithm {
                     Color primaryColor = Pair.ColorType.getPrimaryColor(copy, type[0]);
                     String pairSequence = Pair.getPairSeq(copy, pairType, pairs, primaryColor); // built-in orientation sequence with plug in sequence
 
-                    System.out.println("final pair seq: " + pairSequence);
+                    //System.out.println("final pair seq: " + pairSequence);
 
                     if (copy.sequence.length() < 1) return pairSequence;
                     return copy.sequence + " " + pairSequence;
@@ -858,6 +1056,26 @@ public class CFOPAlg extends CubeAlgorithm {
     private boolean solveOLL(Cube instance) {
         // Placeholder for the logic to solve OLL.
         // Implement actual OLL-solving logic here.
+
+        // identify oll solve
+
+        // get oll solve
+
+        // do solve
+
+        return true;
+    }
+
+    private void identifyOLL(Cube instance){
+
+        // no preconditions necessary :) bc/ this will return null if it can't be identified anyway
+
+
+    }
+
+    // this checks if the yellow face has been solved completely
+    private boolean topLayerSolved(Cube instance){
+
         return false;
     }
 
@@ -869,6 +1087,10 @@ public class CFOPAlg extends CubeAlgorithm {
     private boolean solvePLL(Cube instance) {
         // Placeholder for the logic to solve PLL.
         // Implement actual PLL-solving logic here.
-        return false;
+
+
+        // legit just try every single PLL until it works lmfao, identifying is too weird for this no cyap
+
+        return true;
     }
 }
