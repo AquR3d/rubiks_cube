@@ -84,5 +84,9 @@ public class Main{
 
         System.out.println(cube);
 
+        alg.solveOLL(cube);
+
+        System.out.println(cube);
+
     }
 }

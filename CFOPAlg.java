@@ -2,6 +2,128 @@ import java.util.*;
 
 public class CFOPAlg extends CubeAlgorithm {
 
+    public enum ColorType{
+        PRIMARY {@Override public String toString() { return "PRIMARY"; }},
+        SECONDARY {@Override public String toString() { return "SECONDARY"; }},
+        NULL {@Override public String toString() { return "NULL"; }},
+        // WILL HELP WITH OLL
+        ALPHA,
+        BETA,
+        GAMMA;
+
+        public static ColorType getType(Cube instance, Piece p, Color c){
+
+            if (c == Color.WHITE || c == Color.YELLOW) return ColorType.NULL;
+
+            Color[] type = getPairType(instance, p);
+            if (type == null) return null;
+
+            boolean alphaIsPrimary = Color.isDom(type[0]) == Color.isDom(type[1]);
+
+            if (alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.PRIMARY;
+            if (!alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.SECONDARY;
+            if (!alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.PRIMARY;
+            if (alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.SECONDARY;
+
+            return null;
+        }
+
+        public static Color getPrimaryColor(Cube instance, Piece p){
+
+            Color[] type = getPairType(instance, p);
+            if (type == null) return null;
+
+            boolean alphaIsPrimary = Color.isDom(type[0]) == Color.isDom(type[1]);
+
+            if (alphaIsPrimary) return type[0];
+            else return type[1];
+        }
+
+        // return the color to the left when yellow is on top
+        private static Color getLeftColor(Color c){
+            switch(c){
+                case Color.RED: return Color.BLUE;
+                case Color.GREEN: return Color.RED;
+                case Color.ORANGE: return Color.GREEN;
+                case Color.BLUE: return Color.ORANGE;
+                default: return null;
+            }
+        }
+
+        // return the color to the right when yellow is on top
+        private static Color getRightColor(Color c){
+            switch(c){
+                case Color.RED: return Color.GREEN;
+                case Color.GREEN: return Color.ORANGE;
+                case Color.ORANGE: return Color.BLUE;
+                case Color.BLUE: return Color.RED;
+                default: return null;
+            }
+        }
+
+        // return the color to the back when yellow is on top
+        private static Color getBackColor(Color c){
+            return Color.opp(c);
+        }
+
+        /**
+         * returns sequence that is the @param String seq 
+         * converted into a cube sequence
+         * 
+         * yellow is assumed to be on top
+         *  */ 
+        public static String convertSeq(String seq, Color frontFace){
+
+            // frontFace must be a face color that's not white or yellow
+            if (frontFace == Color.YELLOW || frontFace == Color.WHITE || frontFace == null) return null; 
+
+            String left = getLeftColor(frontFace).toString();
+            String right = getRightColor(frontFace).toString();
+            String back = getBackColor(frontFace).toString();
+
+            String result = "";
+
+            for (int i = 0; i < seq.length(); i++){
+
+                String c = seq.substring(i, i+1);
+                
+                if (c.equals("R")){
+                    c = right;
+                } else if (c.equals("B")){
+                    c = back;
+                } else if (c.equals("L")){
+                    c = left;
+                } else if (c.equals("F")){
+                    c = frontFace.toString();
+                } else if (c.equals("U")){
+                    c = "Y";
+                } else if (c.equals("D")){
+                    c = "W";
+                }
+
+                result += c;
+            }
+
+            return result;
+        }
+
+        // OLL-RELATED
+
+        // gets the location if Color c is on the alpha, gamma, or beta side of Piece p on Cube instance.
+        public static ColorType getColorLoc(Cube instance, Piece p, Color c){
+
+            Color beta = Cube.getBeta(instance, p);
+            Color alpha = Cube.getAlpha(instance, p);
+            Color gamma = Cube.getGamma(instance, p);
+
+            if (c == beta) return ColorType.BETA;
+            if (c == alpha) return ColorType.ALPHA;
+            if (c == gamma) return ColorType.GAMMA;
+
+            return ColorType.NULL;
+        }
+    }
+
     // list of F2L unorientated pairs on the yellow side
     /**
      * U11
@@ -44,66 +166,9 @@ public class CFOPAlg extends CubeAlgorithm {
         L41,
         L42;
 
-        public enum ColorType{
-            PRIMARY {@Override public String toString() { return "PRIMARY"; }},
-            SECONDARY {@Override public String toString() { return "SECONDARY"; }},
-            NULL {@Override public String toString() { return "NULL"; }};
+        
 
-            public static ColorType getType(Cube instance, Piece p, Color c){
-
-                if (c == Color.WHITE || c == Color.YELLOW) return ColorType.NULL;
-
-                Color[] type = getPairType(instance, p);
-                if (type == null) return null;
-
-                boolean alphaIsPrimary = Color.isDom(type[0]) == Color.isDom(type[1]);
-
-                if (alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.PRIMARY;
-                if (!alphaIsPrimary && (c == Color.RED || c == Color.ORANGE)) return ColorType.SECONDARY;
-                if (!alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.PRIMARY;
-                if (alphaIsPrimary && (c == Color.BLUE || c == Color.GREEN)) return ColorType.SECONDARY;
-
-                return null;
-            }
-
-            public static Color getPrimaryColor(Cube instance, Piece p){
-
-                Color[] type = getPairType(instance, p);
-                if (type == null) return null;
-
-                boolean alphaIsPrimary = Color.isDom(type[0]) == Color.isDom(type[1]);
-
-                if (alphaIsPrimary) return type[0];
-                else return type[1];
-            }
-        }
-
-        // return the color to the left when yellow is on top
-        private static Color getLeftColor(Color c){
-            switch(c){
-                case Color.RED: return Color.BLUE;
-                case Color.GREEN: return Color.RED;
-                case Color.ORANGE: return Color.GREEN;
-                case Color.BLUE: return Color.ORANGE;
-                default: return null;
-            }
-        }
-
-        // return the color to the right when yellow is on top
-        private static Color getRightColor(Color c){
-            switch(c){
-                case Color.RED: return Color.GREEN;
-                case Color.GREEN: return Color.ORANGE;
-                case Color.ORANGE: return Color.BLUE;
-                case Color.BLUE: return Color.RED;
-                default: return null;
-            }
-        }
-
-        // return the color to the back when yellow is on top
-        private static Color getBackColor(Color c){
-            return Color.opp(c);
-        }
+        
 
         private static Pair identifyPair(Cube instance, Piece[] pairPieces){
 
@@ -188,46 +253,7 @@ public class CFOPAlg extends CubeAlgorithm {
             return null;
         }
 
-        /**
-         * returns sequence that is the @param String seq 
-         * converted into a cube sequence
-         * 
-         * yellow is assumed to be on top
-         *  */ 
-        public static String convertSeq(String seq, Color frontFace){
-
-            // frontFace must be a face color that's not white or yellow
-            if (frontFace == Color.YELLOW || frontFace == Color.WHITE || frontFace == null) return null; 
-
-            String left = getLeftColor(frontFace).toString();
-            String right = getRightColor(frontFace).toString();
-            String back = getBackColor(frontFace).toString();
-
-            String result = "";
-
-            for (int i = 0; i < seq.length(); i++){
-
-                String c = seq.substring(i, i+1);
-                
-                if (c.equals("R")){
-                    c = right;
-                } else if (c.equals("B")){
-                    c = back;
-                } else if (c.equals("L")){
-                    c = left;
-                } else if (c.equals("F")){
-                    c = frontFace.toString();
-                } else if (c.equals("U")){
-                    c = "Y";
-                } else if (c.equals("D")){
-                    c = "W";
-                }
-
-                result += c;
-            }
-
-            return result;
-        }
+        
 
         // returns all sequences that solve pair
         public static String[] getSequences(Pair pair){
@@ -394,7 +420,7 @@ public class CFOPAlg extends CubeAlgorithm {
             // convert the sequences
             String[] sequences = new String[orderSequences.length];
             for (int i = 0; i < orderSequences.length; i++){
-                sequences[i] = convertSeq(orderSequences[i], primaryColor);
+                sequences[i] = ColorType.convertSeq(orderSequences[i], primaryColor);
             }
             Cube copy = null;
 
@@ -506,69 +532,118 @@ public class CFOPAlg extends CubeAlgorithm {
         I4,
         CO2; // CORNERS-ORIENTED
 
-        public String getAlgorithm(OLL type){
+        public static String getAlgorithm(OLL type){
 
             switch(type){
-                case D1: return "";
-                case D2: return "";
-                case D3: return "";
-                case D4: return "";
-                case S1: return "";
-                case S2: return "";
-                case L1: return "";
-                case L2: return "";
-                case F1: return "";
-                case F2: return "";
-                case L3: return "";
-                case L4: return "";
-                case K1: return "";
-                case K2: return "";
-                case K3: return "";
-                case K4: return "";
-                case D5: return "";
-                case D6: return "";
-                case D7: return "";
-                case D8: return "";
-                case EO1: return "";
-                case EO2: return "";
-                case EO3: return "";
-                case EO4: return "";
-                case EO5: return "";
-                case EO6: return "";
-                case EO7: return "";
-                case CO1: return "";
-                case A1: return "";
-                case A2: return "";
-                case P1: return "";
-                case P2: return "";
-                case T1: return "";
-                case C1: return "";
-                case F3: return "";
-                case W1: return "";
-                case F4: return "";
-                case W2: return "";
-                case L5: return "";
-                case L6: return "";
-                case A3: return "";
-                case A4: return "";
-                case P3: return "";
-                case P4: return "";
-                case T2: return "";
-                case C2: return "";
-                case SL1: return "";
-                case SL2: return "";
-                case SL3: return "";
-                case SL4: return "";
-                case I1: return "";
-                case I2: return "";
-                case SL5: return "";
-                case SL6: return "";
-                case I3: return "";
-                case I4: return "";
-                case CO2: return "";
+                case D1: return "R U2 R2 F R F' U2 R' F R F'";
+                case D2: return "L F L' U2 L F2 R' F2 R F' L'";
+                case D3: return "F U R U' R' F' U F R U R' U' F'";
+                case D4: return "F U R U' R' F' U' F R U R' U' F'";
+                case S1: return "R' F2 L F L' F R";
+                case S2: return "L F2 R' F' R F' L'";
+                case L1: return "L F R' F R F2 L'";
+                case L2: return "R' F' L F' L' F2 R";
+                case F1: return "R U R' U' R' F R2 U R' U' F'";
+                case F2: return "R U R' U R' F R F' R U2 R'";
+                case L3: return "L F R' F R' D R D' R F2 L'";
+                case L4: return "R' F' L F' L D' L' D L' F2 R";
+                case K1: return "L F' L' U' L F L' F' U F";
+                case K2: return "R' F R U R' F' R F U' F'";
+                case K3: return "R' F' R L' U' L U R' F R";
+                case K4: return "L F L' R U R' U' L F' L'";
+                case D5: return "R U R' U R' F R F' U2 R' F R F'";
+                case D6: return "L F R' F R F2 L2 B' R B' R' B2 L";
+                case D7: return "L' R B R B R' B' L R2 F R F'";
+                case D8: return "L' R B R B R' B' L2 R2 F R F' L'";
+                case EO1: return "R U2 R' U' R U R' U' R U' R'";
+                case EO2: return "R U2 R2 U' R2 U' R2 U2 R";
+                case EO3: return "R2 D' R U2 R' D R U2 R";
+                case EO4: return "L F R' F' L' F R F'";
+                case EO5: return "R' F R B' R' F' R B";
+                case EO6: return "R U2 R' U' R U' R'";
+                case EO7: return "R U R' U R U2 R'";
+                case CO1: return "L F R' F' L' R U R U' R'";
+                case A1: return "R U R' U' R U' R' F' U' F R U R'";
+                case A2: return "F R' F R2 U' R' U' R U R' F2";
+                case P1: return "R' U' F U R U' R' F' R";
+                case P2: return "L U F' U' L' U L F L'";
+                case T1: return "R U R' U' R' F R F'";
+                case C1: return "R U R' U' B' R' F R F' B";
+                case F3: return "R U2 R2 F R F' R U2 R'";
+                case W1: return "L' U' L U' L' U L U L F' L' F";
+                case F4: return "F R' F' R U R U' R'";
+                case W2: return "R U R' U R U' R' U' R' F R F'";
+                case L5: return "L F' L' U' L U F U' L'";
+                case L6: return "R' F R U R' U' F' U R";
+                case A3: return "R U R' U R U2 R' F R U R' U' F'";
+                case A4: return "R' U' R U' R U2 R F R U R' U' F'";
+                case P3: return "F' U' L' U L F";
+                case P4: return "F U R U' R' F'";
+                case T2: return "F R U R' U' F'";
+                case C2: return "R' U' R' F R F' U R";
+                case SL1: return "F' L' U' L U L' U' L U F";
+                case SL2: return "F R U R' U' R U R' U' F'";
+                case SL3: return "L F' L2 B L2 F L2 B' L";
+                case SL4: return "L' B L2 F' L2 B' L2 F L'";
+                case I1: return "F U R U' R' U R U' R' F'";
+                case I2: return "R U R' U R U' B U' B' R'";
+                case SL5: return "R' F2 L F L' F' L F L' F R";
+                case SL6: return "L F2 R' F' R F R' F' R F' L'";
+                case I3: return "R U2 R2 U' R U' R' U2 F R F'";
+                case I4: return "L F L' U R U' R' U R U' R' L F' L'";
+                case CO2: return "R U R' U' L R' F R F' L'";
             }
 
             return null;
+        }
+
+        public static String identifyOLL(Cube instance){
+
+            // no preconditions necessary :) bc/ this will return null if it can't be identified anyway
+    
+            Cube copy = null; // keep copy of the cube
+            Color[] faces = {Color.RED, Color.BLUE, Color.ORANGE, Color.GREEN};
+
+            // for each oll
+            for (OLL o : OLL.values()){
+
+                // for the 4 different ways the oll can be used...
+                for(Color face : faces){
+                    copy = new Cube(instance);
+
+                    // get oll seqeunce oriented
+                    String ollSeq = OLL.getAlgorithm(o);
+                    ollSeq = ColorType.convertSeq(ollSeq, face);
+
+                    // see if it solves the cube
+                    boolean ran = Cube.scramble(copy, ollSeq);
+                    if (!ran)
+                        System.out.println(o.ordinal() + ": " + ran);
+
+                    // return the sequence!
+                    if (topLayerSolved(copy)){
+                        System.out.println("OLL: " + (o.ordinal()+1));
+                        return ollSeq;
+                    }
+
+                }
+            }
+
+    
+
+            return null;
+        }
+    
+        // this checks if the yellow face has been solved completely
+        public static boolean topLayerSolved(Cube instance){
+
+            Piece[] yellowPieces = {Piece.R8B6Y0, Piece.B7Y1, Piece.O6B8Y2, Piece.R7Y3, Piece.O7Y5, Piece.R6G8Y6, Piece.G7Y7, Piece.O8G6Y8};
+
+            for (Piece yp : yellowPieces){
+                if (Cube.getGamma(instance, yp) != Color.YELLOW) return false;
+            }
+    
+            return true;
         }
     }
 
@@ -1027,7 +1102,7 @@ public class CFOPAlg extends CubeAlgorithm {
                     Pair pairType = Pair.identifyOrientatePair(copy, colors);
 
                     // get orientation sequence
-                    Color primaryColor = Pair.ColorType.getPrimaryColor(copy, type[0]);
+                    Color primaryColor = ColorType.getPrimaryColor(copy, type[0]);
                     String pairSequence = Pair.getPairSeq(copy, pairType, pairs, primaryColor); // built-in orientation sequence with plug in sequence
 
                     //System.out.println("final pair seq: " + pairSequence);
@@ -1053,30 +1128,18 @@ public class CFOPAlg extends CubeAlgorithm {
      * returns true if successful, false if it fails to make progress
      */
 
-    private boolean solveOLL(Cube instance) {
+    public boolean solveOLL(Cube instance) {
         // Placeholder for the logic to solve OLL.
         // Implement actual OLL-solving logic here.
 
-        // identify oll solve
-
         // get oll solve
+        String seq = OLL.identifyOLL(instance);
+        System.out.println(seq);
 
         // do solve
+        Cube.scramble(instance, seq);
 
-        return true;
-    }
-
-    private void identifyOLL(Cube instance){
-
-        // no preconditions necessary :) bc/ this will return null if it can't be identified anyway
-
-
-    }
-
-    // this checks if the yellow face has been solved completely
-    private boolean topLayerSolved(Cube instance){
-
-        return false;
+        return OLL.topLayerSolved(instance);
     }
 
     /**
@@ -1084,7 +1147,7 @@ public class CFOPAlg extends CubeAlgorithm {
      * returns true if successful, false if it fails to make progress
      */
 
-    private boolean solvePLL(Cube instance) {
+    public boolean solvePLL(Cube instance) {
         // Placeholder for the logic to solve PLL.
         // Implement actual PLL-solving logic here.
 

@@ -4,7 +4,8 @@ public enum Color{
     WHITE { @Override public String toString(){ return "W"; } },
     YELLOW { @Override public String toString(){ return "Y"; } },
     ORANGE { @Override public String toString(){ return "O"; } },
-    GREEN { @Override public String toString(){ return "G"; } };
+    GREEN { @Override public String toString(){ return "G"; } },
+    NULL;
 
     public static Color fromInt(int idx){
         switch (idx){
@@ -43,6 +44,9 @@ public enum Color{
     }
 
     public static boolean isDom(Color other){
+
+        if (other == null) return false;
+
         switch(other){
             case RED: return true;
             case BLUE: return true;
