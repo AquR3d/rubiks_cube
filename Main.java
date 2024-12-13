@@ -81,8 +81,8 @@ public class Main{
         CFOPAlg alg = new CFOPAlg(null);
 
         // cfop testings
-        Cube cube = new Cube();
-        Cube.scramble(cube, 6, 20);
+        Cube cube = new Cube("Y2 B' W2 G2 W' R Y2 B' O2 B' R' W2 Y B' O' Y2 O'");
+        //Cube.scramble(cube, 6, 20);
 
         System.out.println(cube);
 
@@ -98,5 +98,8 @@ public class Main{
 
         System.out.println(cube);
 
+        alg.solvePLL(cube);
+
+        System.out.println(cube);
     }
 }
