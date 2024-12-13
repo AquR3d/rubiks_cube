@@ -433,8 +433,9 @@ public class CFOPAlg extends CubeAlgorithm {
                 // prints
                 //System.out.println(sequences[i]);
                 //System.out.println(copy);
-
                 //System.out.println(pairs(copy));
+
+
                 if (pairs(copy) == pairs){
                     return sequences[i];
                 }
@@ -576,7 +577,7 @@ public class CFOPAlg extends CubeAlgorithm {
                 case L5: return "L F' L' U' L U F U' L'";
                 case L6: return "R' F R U R' U' F' U R";
                 case A3: return "R U R' U R U2 R' F R U R' U' F'";
-                case A4: return "R' U' R U' R U2 R F R U R' U' F'";
+                case A4: return "R' U' R U' R' U2 R B' R' U' R U B";
                 case P3: return "F' U' L' U L F";
                 case P4: return "F U R U' R' F'";
                 case T2: return "F R U R' U' F'";
@@ -1025,7 +1026,7 @@ public class CFOPAlg extends CubeAlgorithm {
             if (pairs >= 4) break;
 
             // get solve to another part of pairs
-            String seq = solveToF2L(instance, pairs+1); // add method of breadth searcth to find solve
+            String seq = solveToF2L(instance, pairs+1); // add method of breadth search to find solve
 
             //System.out.println("seq received: \'" + seq + "\'");
             //System.out.println(instance);
@@ -1132,6 +1133,9 @@ public class CFOPAlg extends CubeAlgorithm {
         // Placeholder for the logic to solve OLL.
         // Implement actual OLL-solving logic here.
 
+        // preconditions: cube not solved
+        if (OLL.topLayerSolved(instance)) return true;
+
         // get oll solve
         String seq = OLL.identifyOLL(instance);
         System.out.println(seq);
@@ -1153,6 +1157,9 @@ public class CFOPAlg extends CubeAlgorithm {
 
 
         // legit just try every single PLL until it works lmfao, identifying is too weird for this no cyap
+        if (isSolved(instance)) return true;
+
+
 
         return true;
     }

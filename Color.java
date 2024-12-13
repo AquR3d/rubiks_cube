@@ -4,8 +4,9 @@ public enum Color{
     WHITE { @Override public String toString(){ return "W"; } },
     YELLOW { @Override public String toString(){ return "Y"; } },
     ORANGE { @Override public String toString(){ return "O"; } },
-    GREEN { @Override public String toString(){ return "G"; } },
-    NULL;
+    GREEN { @Override public String toString(){ return "G"; } };
+
+    // DO NOT ADD ANYMORE COLORS TO THIS... CubeAlgorithm.addInstances() will start having rare errors...
 
     public static Color fromInt(int idx){
         switch (idx){
